@@ -97,11 +97,11 @@
 ## 기술 스택
 
 ### 프론트엔드
-- **React** (TypeScript) - 컴포넌트 기반 UI 개발
-- **Tailwind CSS** (스타일링) - 빠른 개발과 일관된 디자인
+- **HTML5* + **JavaScript** (ES6 - 간단하고 빠른 개발
+- **CSS3* (스타일링) - 모던한 디자인과 반응형 레이아웃
 - **Chart.js** (ICM 계산 결과 시각화) - 직관적인 차트 표시
-- **React Hook Form** (폼 관리) - 효율적인 폼 상태 관리
-- **Axios** (HTTP 클라이언트) - 안정적인 API 통신
+- **Vanilla JavaScript** (DOM 조작) - 가벼운 프론트엔드 구현
+- **Fetch API** (HTTP 클라이언트) - 네이티브 API 통신
 
 ### 백엔드
 - **Node.js** + **Express** (TypeScript) - 빠른 개발과 확장성
@@ -115,30 +115,22 @@
 ```
 sng-icm-app/
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── GameSetup.tsx
-│   │   │   ├── PlayerInput.tsx
-│   │   │   ├── HandSelector.tsx
-│   │   │   ├── ICMCalculator.tsx
-│   │   │   ├── PushFoldDecision.tsx
-│   │   │   ├── Results.tsx
-│   │   │   └── LoadingSpinner.tsx
-│   │   ├── hooks/
-│   │   │   ├── useICMCalculation.ts
-│   │   │   └── useGameState.ts
-│   │   ├── types/
-│   │   │   └── index.ts
-│   │   ├── utils/
-│   │   │   ├── pokerUtils.ts
-│   │   │   └── validation.ts
-│   │   ├── services/
-│   │   │   └── api.ts
-│   │   └── App.tsx
-│   ├── public/
+│   ├── index.html
+│   ├── css/
+│   │   ├── style.css
+│   │   └── responsive.css
+│   ├── js/
+│   │   ├── app.js
+│   │   ├── gameSetup.js
+│   │   ├── handSelector.js
+│   │   ├── icmCalculator.js
+│   │   ├── results.js
+│   │   ├── utils.js
+│   │   └── api.js
+│   ├── assets/
 │   │   └── cards/ (카드 이미지)
-│   ├── package.json
-│   └── tailwind.config.js
+│   └── lib/
+│       └── chart.js
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/
