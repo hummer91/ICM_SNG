@@ -2,21 +2,21 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 import apiRoutes from './routes';
-
-// 환경 변수 로드
-dotenv.config();
+import config from '../config/environment';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.PORT;
 
 // 미들웨어 설정
 app.use(helmet()); // 보안 헤더 설정
-app.use(cors()); // CORS 설정
+app.use(cors({
+  origin: config.CORS_ORIGIN.split(','),
+  credentials: true
+})); // CORS 설정
 app.use(morgan('combined')); // 로깅
 app.use(express.json({ limit: '10mb' })); // JSON 파싱
 app.use(express.urlencoded({ extended: true })); // URL 인코딩 파싱
