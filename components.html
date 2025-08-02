@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Linear 디자인 시스템 컴포넌트 데모">
+    <meta name="theme-color" content="#080910">
+    
+    <title>컴포넌트 데모 - ICM SNG</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    
+    <!-- Inter 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/src/css/main.css">
+    <link rel="stylesheet" href="/src/css/components.css">
+    <link rel="stylesheet" href="/src/css/demo.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 헤더 -->
+        <header class="demo-header">
+            <div class="container">
+                <h1>Linear 디자인 시스템</h1>
+                <p class="subtitle">ICM SNG 컴포넌트 라이브러리</p>
+                <nav class="demo-nav">
+                    <a href="#colors">색상</a>
+                    <a href="#typography">타이포그래피</a>
+                    <a href="#buttons">버튼</a>
+                    <a href="#inputs">입력</a>
+                    <a href="#cards">카드</a>
+                    <a href="#modals">모달</a>
+                    <a href="#toasts">토스트</a>
+                    <a href="#rangechart">레인지 차트</a>
+                    <a href="#poker">포커 UI</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="demo-main">
+            <div class="container">
+                <!-- 색상 시스템 -->
+                <section id="colors" class="demo-section">
+                    <h2>색상 시스템</h2>
+                    <div class="color-grid"></div>
+                </section>
+
+                <!-- 타이포그래피 -->
+                <section id="typography" class="demo-section">
+                    <h2>타이포그래피</h2>
+                    <div class="typography-demo"></div>
+                </section>
+
+                <!-- 버튼 -->
+                <section id="buttons" class="demo-section">
+                    <h2>버튼</h2>
+                    <div class="button-demo"></div>
+                </section>
+
+                <!-- 입력 필드 -->
+                <section id="inputs" class="demo-section">
+                    <h2>입력 필드</h2>
+                    <div class="input-demo"></div>
+                </section>
+
+                <!-- 카드 -->
+                <section id="cards" class="demo-section">
+                    <h2>카드</h2>
+                    <div class="card-demo"></div>
+                </section>
+
+                <!-- 모달 -->
+                <section id="modals" class="demo-section">
+                    <h2>모달</h2>
+                    <div class="modal-demo"></div>
+                </section>
+
+                <!-- 토스트 알림 -->
+                <section id="toasts" class="demo-section">
+                    <h2>토스트 알림</h2>
+                    <div class="toast-demo"></div>
+                </section>
+
+                <!-- 레인지 차트 -->
+                <section id="rangechart" class="demo-section">
+                    <h2>레인지 차트</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                        프리플랍 핸드 레인지를 13x13 그리드로 표시합니다. EV 값에 따라 색상이 변경됩니다.
+                    </p>
+                    <div class="rangechart-demo"></div>
+                </section>
+
+                <!-- 포커 전용 UI -->
+                <section id="poker" class="demo-section">
+                    <h2>포커 전용 UI</h2>
+                    <div class="poker-demo"></div>
+                </section>
+            </div>
+        </main>
+
+        <!-- 토스트 컨테이너 -->
+        <div id="toast-container"></div>
+
+        <!-- 모달 컨테이너 -->
+        <div id="modal-container"></div>
+    </div>
+    
+    <!-- JavaScript 모듈 -->
+    <script type="module" src="/src/js/components/index.js"></script>
+    <script type="module" src="/src/js/demo.js"></script>
+</body>
+</html>
