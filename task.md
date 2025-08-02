@@ -3,23 +3,27 @@
 ## Phase 0: 개발 환경 및 도구 설정 (1일)
 
 ### 0.1 패키지 매니저 및 빌드 도구
+
 - [x] pnpm 설치 및 프로젝트 초기화
 - [x] Vite 설정 (빠른 개발 서버 및 빌드)
 - [x] TypeScript 설정 (선택사항, 타입 안정성)
 
 ### 0.2 테스트 환경 구축
+
 - [x] Vitest 설치 및 설정
 - [x] Testing Library 통합
 - [x] Playwright 설정 (E2E 테스트)
 - [x] 테스트 커버리지 설정
 
 ### 0.3 코드 품질 도구
-- [ ] ESLint 설정 (코드 스타일)
-- [ ] Prettier 설정 (코드 포매팅)
-- [ ] Husky 설치 (Git hooks)
-- [ ] lint-staged 설정 (커밋 전 검사)
+
+- [x] ESLint 설정 (코드 스타일)
+- [x] Prettier 설정 (코드 포매팅)
+- [x] Husky 설치 (Git hooks)
+- [x] lint-staged 설정 (커밋 전 검사)
 
 ### 0.4 모니터링 및 분석
+
 - [ ] Sentry 통합 (에러 추적)
 - [ ] PostHog 또는 Amplitude 설정 (사용자 분석)
 - [ ] 환경별 설정 분리 (dev/prod)
@@ -30,6 +34,7 @@
 - [ ] 성능 예산 설정
 
 ### 0.5 CI/CD 파이프라인
+
 - [ ] GitHub Actions 설정
   - [ ] 자동 테스트 실행 (push/PR 시)
   - [ ] 빌드 검증
@@ -38,11 +43,13 @@
 - [ ] 의존성 취약점 스캔 (Snyk/Dependabot)
 
 ### 0.6 문서화 도구
+
 - [ ] Storybook 설정 (UI 컴포넌트 문서화)
 - [ ] JSDoc 설정 및 템플릿 작성
 - [ ] 자동 문서 생성 스크립트
 
 ### 0.7 보안 설정
+
 - [ ] Content Security Policy (CSP) 설정
 - [ ] XSS 방지를 위한 sanitization 라이브러리
 - [ ] HTTPS 강제 설정
@@ -51,12 +58,14 @@
 ## Phase 1: 기초 설정 (1일)
 
 ### 1.1 프로젝트 초기 설정
+
 - [ ] 기본 디렉토리 구조 생성
 - [ ] index.html 작성 (기본 레이아웃)
 - [ ] package.json 의존성 관리
 - [ ] Vite 개발 서버 설정
 
 ### 1.2 Linear 디자인 시스템 구현
+
 - [ ] CSS 변수로 디자인 토큰 설정
   ```css
   /* 색상 시스템 */
@@ -88,23 +97,36 @@
   - [ ] sm: 640px, md: 768px, lg: 1024px
 
 ### 1.3 기본 스타일링
+
 - [ ] main.css 작성 (Linear 디자인 시스템 적용)
+
   ```css
   /* 다크 테마 배경 계층 */
-  body { background: var(--bg-primary); }
-  .container { background: var(--bg-secondary); }
-  .card { background: var(--bg-tertiary); }
-  
+  body {
+    background: var(--bg-primary);
+  }
+  .container {
+    background: var(--bg-secondary);
+  }
+  .card {
+    background: var(--bg-tertiary);
+  }
+
   /* 텍스트 계층 */
-  .text-primary { color: var(--text-primary); }
-  .text-secondary { color: var(--text-secondary); }
-  
+  .text-primary {
+    color: var(--text-primary);
+  }
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+
   /* 포커 효과 */
-  :focus { 
+  :focus {
     border-color: rgba(94, 106, 210, 0.5);
     box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1);
   }
   ```
+
 - [ ] components.css 작성 (컴포넌트별 스타일)
 - [ ] 다크 테마 최적화
   - [ ] 높은 대비율 유지
@@ -115,6 +137,7 @@
 ## Phase 2: 핵심 로직 구현 (3-4일)
 
 ### 2.1 ICM 계산 엔진
+
 - [ ] icm.js 파일 생성
 - [ ] Malmuth-Harville 공식 구현
 - [ ] 각 플레이어의 1위, 2위, 3위 확률 계산
@@ -122,6 +145,7 @@
 - [ ] 단위 테스트 작성
 
 ### 2.2 Push/Fold 차트 로직
+
 - [ ] pushfold.js 파일 생성
 - [ ] Nash Equilibrium 범위 데이터 구조 설계
 - [ ] 신뢰할 수 있는 Nash Equilibrium 데이터 소스 확보
@@ -133,11 +157,13 @@
 - [ ] 스택 깊이에 따른 범위 조정 로직
 
 ### 2.3 게임 상태 관리
+
 - [ ] 플레이어 데이터 모델 설계
 - [ ] 게임 상태 (블라인드, 스택, 포지션) 관리
 - [ ] 액션 히스토리 추적 시스템
 
 ### 2.4 데이터 검증 계층
+
 - [ ] 입력 검증 미들웨어
   - [ ] 스택 사이즈 범위 검증 (0.5BB - 100BB)
   - [ ] 포지션 유효성 검사 (BTN, SB, BB, UTG, MP, CO)
@@ -154,6 +180,7 @@
 ## Phase 3: 사용자 인터페이스 (3-4일)
 
 ### 3.1 테이블 뷰 구현 (Linear 스타일)
+
 - [ ] 6인 포커 테이블 레이아웃
   - [ ] 다크 배경 (--bg-primary)
   - [ ] 테이블 원형 디자인
@@ -171,6 +198,7 @@
   - [ ] 위치 표시기
 
 ### 3.2 컨트롤 패널 (Linear 컴포넌트)
+
 - [ ] 스택 사이즈 입력 UI
   - [ ] Linear 스타일 input (--bg-tertiary)
   - [ ] 포커스 효과 (--brand-purple glow)
@@ -189,6 +217,7 @@
   - [ ] 상태별 색상 (--error, --warning, --success)
 
 ### 3.3 결과 표시 (Linear 스타일)
+
 - [ ] Push/Fold 추천 표시
   - [ ] 추천 액션 카드 (--bg-secondary)
   - [ ] 액션 버튼 (primary variant)
@@ -213,6 +242,7 @@
   - [ ] 인터랙티브 데이터 포인트
 
 ### 3.4 실시간 피드백 시스템 (Linear 알림 스타일)
+
 - [ ] 잘못된 결정 시 즉각적인 알림 UI
   - [ ] Toast 알림 (우측 상단)
   - [ ] 슬라이드인 애니메이션
@@ -232,6 +262,7 @@
   - [ ] 진동 효과 (실수 시)
 
 ### 3.5 접근성 (A11y)
+
 - [ ] 스크린 리더 지원
   - [ ] ARIA 라벨 추가 (버튼, 입력 필드)
   - [ ] 동적 콘텐츠 업데이트 알림 (aria-live)
@@ -247,6 +278,7 @@
 - [ ] 텍스트 크기 조절 기능
 
 ### 3.6 모바일 최적화
+
 - [ ] 터치 제스처 구현
   - [ ] 스와이프로 액션 선택 (Push/Fold)
   - [ ] 핀치 줌 (테이블 뷰 확대/축소)
@@ -263,6 +295,7 @@
   - [ ] 이미지 최적화 (webp, 반응형)
 
 ### 3.7 UI 컨트롤러
+
 - [ ] ui.js 구현
 - [ ] 이벤트 핸들러 설정
 - [ ] 데이터 바인딩
@@ -271,24 +304,28 @@
 ## Phase 4: 통합 및 최적화 (2-3일)
 
 ### 4.1 메인 애플리케이션
+
 - [ ] main.js 작성
 - [ ] 모듈 통합
 - [ ] 초기화 로직
 - [ ] 에러 처리
 
 ### 4.2 성능 최적화
+
 - [ ] ICM 계산 결과 캐싱
 - [ ] 범위 데이터 지연 로딩
 - [ ] Web Worker 구현 (복잡한 계산용)
 - [ ] 메모리 사용 최적화
 
 ### 4.3 사용자 경험 개선
+
 - [ ] 로딩 인디케이터
 - [ ] 툴팁 및 도움말
 - [ ] 키보드 단축키
 - [ ] 설정 저장 (localStorage)
 
 ### 4.4 오프라인 지원
+
 - [ ] Service Worker 구현
   - [ ] 오프라인 모드 활성화
   - [ ] 핵심 리소스 캐싱
@@ -304,12 +341,14 @@
 ## Phase 5: 학습 기능 (2-3일)
 
 ### 5.1 학습 모드
+
 - [ ] 퀴즈 시스템 구현
 - [ ] 정답/오답 피드백
 - [ ] 상세 설명 제공
 - [ ] 진행도 추적
 
 ### 5.2 시나리오 생성
+
 - [ ] 랜덤 상황 생성기
 - [ ] 난이도 설정
 - [ ] 실제 토너먼트 시나리오
@@ -318,18 +357,21 @@
 ## Phase 6: 테스트 및 배포 (1-2일)
 
 ### 6.1 테스트
+
 - [ ] 단위 테스트 완성
 - [ ] 통합 테스트
 - [ ] 브라우저 호환성 테스트
 - [ ] 모바일 반응형 테스트
 
 ### 6.2 배포 준비
+
 - [ ] 프로덕션 빌드 최적화
 - [ ] 파일 압축 및 최소화
 - [ ] 서버 설정 문서화
 - [ ] 배포 스크립트 작성
 
 ### 6.3 문서화
+
 - [ ] 사용자 가이드 작성
 - [ ] API 문서화
 - [ ] 배포 가이드
@@ -338,12 +380,14 @@
 ## 추가 기능 (향후)
 
 ### 7.1 고급 기능
+
 - [ ] 멀티웨이 팟 지원
 - [ ] ICM 계산기 독립 모드
 - [ ] 커스텀 상금 구조
 - [ ] 히스토리 내보내기
 
 ### 7.2 데이터 분석 도구
+
 - [ ] 세션별 ROI 추적 시스템
   - [ ] 세션 시작/종료 시간 기록
   - [ ] 총 칩 변화량 추적
@@ -365,6 +409,7 @@
   - [ ] 맞춤형 학습 추천
 
 ### 7.3 커뮤니티 기능
+
 - [ ] 시나리오 공유
 - [ ] 리더보드
 - [ ] 챌린지 모드
@@ -373,39 +418,43 @@
 ## 품질 지표
 
 ### 성능 목표
+
 ```javascript
 const performanceMetrics = {
-  icmCalculationTime: '<100ms',     // ICM 계산 시간
-  pageLoadTime: '<2s',              // 페이지 로드 시간
-  interactionDelay: '<50ms',        // 사용자 입력 반응
-  memoryUsage: '<50MB',            // 메모리 사용량
-  bundleSize: '<500KB'             // 초기 번들 크기
+  icmCalculationTime: '<100ms', // ICM 계산 시간
+  pageLoadTime: '<2s', // 페이지 로드 시간
+  interactionDelay: '<50ms', // 사용자 입력 반응
+  memoryUsage: '<50MB', // 메모리 사용량
+  bundleSize: '<500KB', // 초기 번들 크기
 };
 ```
 
 ### 테스트 커버리지
+
 ```javascript
 const testingMetrics = {
-  unitTestCoverage: '>80%',        // 단위 테스트
-  e2eTestCoverage: '>60%',         // E2E 테스트
-  a11yScore: '>90',                // 접근성 점수
-  browserSupport: 'last 2 versions' // 브라우저 지원
+  unitTestCoverage: '>80%', // 단위 테스트
+  e2eTestCoverage: '>60%', // E2E 테스트
+  a11yScore: '>90', // 접근성 점수
+  browserSupport: 'last 2 versions', // 브라우저 지원
 };
 ```
 
 ### 사용자 경험 지표
+
 ```javascript
 const userExperienceMetrics = {
-  errorRate: '<1%',                // 에러 발생률
-  sessionLength: '>10min',         // 평균 세션 길이
-  returnRate: '>40%',              // 재방문율
-  learningProgress: '>70%'         // 학습 완료율
+  errorRate: '<1%', // 에러 발생률
+  sessionLength: '>10min', // 평균 세션 길이
+  returnRate: '>40%', // 재방문율
+  learningProgress: '>70%', // 학습 완료율
 };
 ```
 
 ## 리스크 및 대응 방안
 
 ### 기술적 리스크
+
 1. **Nash Equilibrium 데이터 라이선스**
    - 리스크: 저작권 문제 가능성
    - 대응: 오픈소스 대안 조사, 자체 계산 엔진 개발 준비
@@ -419,6 +468,7 @@ const userExperienceMetrics = {
    - 대응: 폴리필 사용, 점진적 개선 전략
 
 ### 일정 리스크
+
 1. **Phase 0 추가로 인한 지연**
    - 리스크: 전체 일정 1-2일 연장 가능
    - 대응: MVP에서 일부 도구 제외, 핵심 도구 우선 설정
@@ -428,6 +478,7 @@ const userExperienceMetrics = {
    - 대응: 우선순위 명확화, 단계적 출시 전략
 
 ## 예상 일정
+
 - **총 개발 기간**: 16-19일
 - **개발 환경 구축**: 1일 (Phase 0)
 - **MVP 완성**: 9-11일 (Phase 0-4)
@@ -435,11 +486,13 @@ const userExperienceMetrics = {
 - **전체 기능 완성**: 16-19일 (Phase 0-7)
 
 ## 우선순위
+
 1. **필수**: Phase 0 (개발 환경) + Phase 1-4 (핵심 기능)
 2. **중요**: Phase 5 (학습 기능)
 3. **선택**: Phase 6-7 (최적화 및 추가 기능)
 
 ## 도구 선택 이유
+
 - **pnpm**: npm/yarn보다 빠른 설치 속도, 디스크 공간 절약
 - **Vite**: 빠른 HMR, 최적화된 빌드
 - **Vitest**: Vite와 완벽한 통합, Jest 호환 API
