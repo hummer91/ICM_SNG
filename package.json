@@ -47,7 +47,11 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "chart.js": "^4.4.1"
+    "@sentry/browser": "^10.0.0",
+    "@sentry/integrations": "^7.114.0",
+    "chart.js": "^4.4.1",
+    "posthog-js": "^1.258.5",
+    "web-vitals": "^5.1.0"
   },
   "engines": {
     "node": ">=18.0.0",

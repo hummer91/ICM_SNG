@@ -24,14 +24,14 @@
 
 ### 0.4 모니터링 및 분석
 
-- [ ] Sentry 통합 (에러 추적)
-- [ ] PostHog 또는 Amplitude 설정 (사용자 분석)
-- [ ] 환경별 설정 분리 (dev/prod)
-- [ ] Core Web Vitals 모니터링
-  - [ ] LCP (Largest Contentful Paint) < 2.5s
-  - [ ] FID (First Input Delay) < 100ms
-  - [ ] CLS (Cumulative Layout Shift) < 0.1
-- [ ] 성능 예산 설정
+- [x] Sentry 통합 (에러 추적)
+- [x] PostHog 또는 Amplitude 설정 (사용자 분석)
+- [x] 환경별 설정 분리 (dev/prod)
+- [x] Core Web Vitals 모니터링
+  - [x] LCP (Largest Contentful Paint) < 2.5s
+  - [x] FID (First Input Delay) < 100ms
+  - [x] CLS (Cumulative Layout Shift) < 0.1
+- [x] 성능 예산 설정
 
 ### 0.5 CI/CD 파이프라인
 
