@@ -1,0 +1,27 @@
+# 빌드 결과물
+dist/
+build/
+coverage/
+test-results/
+
+# 의존성
+node_modules/
+package-lock.json
+
+# 에셋
+public/
+*.min.js
+*.min.css
+
+# 기타
+.git/
+.vscode/
+.idea/
+
+# 특정 파일
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico

@@ -1,6 +1,6 @@
 /**
  * ICM (Independent Chip Model) 계산 엔진
- * 
+ *
  * Malmuth-Harville 공식을 사용하여 토너먼트 equity 계산
  */
 
@@ -20,9 +20,9 @@ export class ICMCalculator {
     }
 
     // 음수 스택을 0으로 처리
-    const cleanStacks = stacks.map(stack => Math.max(0, stack));
+    const cleanStacks = stacks.map((stack) => Math.max(0, stack));
     const totalChips = cleanStacks.reduce((sum, stack) => sum + stack, 0);
-    
+
     if (totalChips === 0) {
       return cleanStacks.map(() => 0);
     }
@@ -54,7 +54,7 @@ export class ICMCalculator {
   calculatePlaceProbability(stacks, playerIndex, place) {
     const n = stacks.length;
     const totalChips = stacks.reduce((sum, stack) => sum + stack, 0);
-    
+
     if (place === 0) {
       // 1등 확률 = 칩 비율
       return stacks[playerIndex] / totalChips;
@@ -62,29 +62,31 @@ export class ICMCalculator {
 
     // 2등 이하: 재귀적 계산
     let probability = 0;
-    
+
     // 각 플레이어가 1등을 하는 경우를 고려
     for (let winner = 0; winner < n; winner++) {
-      if (winner === playerIndex || stacks[winner] === 0) continue;
-      
+      if (winner === playerIndex || stacks[winner] === 0) {
+        continue;
+      }
+
       // winner가 1등할 확률
       const winProb = stacks[winner] / totalChips;
-      
+
       // winner를 제외한 나머지 스택
       const remainingStacks = stacks.filter((_, idx) => idx !== winner);
       const remainingPlayerIndex = playerIndex > winner ? playerIndex - 1 : playerIndex;
-      
+
       if (playerIndex !== winner) {
         // 재귀적으로 나머지 플레이어들 중에서 place-1 등을 할 확률 계산
         const remainingProb = this.calculatePlaceProbability(
           remainingStacks,
           remainingPlayerIndex,
-          place - 1
+          place - 1,
         );
         probability += winProb * remainingProb;
       }
     }
-    
+
     return probability;
   }
 
@@ -99,14 +101,14 @@ export class ICMCalculator {
       callerStack,
       callProbability,
       winProbability,
-      otherStacks = []
+      otherStacks = [],
     } = params;
 
     // 현재 스택 상황
     const currentStacks = [...otherStacks];
     currentStacks.splice(pusherIndex, 0, pusherStack);
     currentStacks.splice(callerIndex, 0, callerStack);
-    
+
     const currentEquity = this.calculate(currentStacks)[pusherIndex];
 
     // Fold된 경우의 스택
@@ -128,7 +130,7 @@ export class ICMCalculator {
     // Expected Value 계산
     const callEV = winProbability * winEquity + (1 - winProbability) * loseEquity;
     const ev = (1 - callProbability) * foldEquity + callProbability * callEV;
-    
+
     return ev - currentEquity;
   }
 
@@ -137,8 +139,8 @@ export class ICMCalculator {
    */
   calculateBubbleFactor(stacks, pusherIndex, callerIndex) {
     const n = stacks.length;
-    const inTheMoney = this.prizeStructure.filter(p => p > 0).length;
-    
+    const inTheMoney = this.prizeStructure.filter((p) => p > 0).length;
+
     // 헤즈업이거나 모든 플레이어가 상금을 받는 경우
     if (n <= 2 || n <= inTheMoney) {
       return 1.0;
@@ -150,14 +152,14 @@ export class ICMCalculator {
 
     // ICM EV
     const currentEquity = this.calculate(stacks)[callerIndex];
-    
+
     // 버블 팩터 = ICM 압력 / 칩 압력
     const bubbleFactor = currentEquity / chipEV;
-    
+
     // 버블에 가까울수록 팩터가 증가
-    const playersRemaining = stacks.filter(s => s > 0).length;
+    const playersRemaining = stacks.filter((s) => s > 0).length;
     const distanceFromBubble = playersRemaining - inTheMoney;
-    
+
     if (distanceFromBubble === 1) {
       // 정확히 버블 상황
       return bubbleFactor * 1.5;
@@ -165,7 +167,7 @@ export class ICMCalculator {
       // 버블에 가까운 상황
       return bubbleFactor * 1.2;
     }
-    
+
     return bubbleFactor;
   }
 }

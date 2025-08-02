@@ -6,9 +6,15 @@ import '@testing-library/jest-dom';
 
 // 전역 모의 함수 및 설정
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() {
+    // ResizeObserver mock
+  }
+  unobserve() {
+    // ResizeObserver mock
+  }
+  disconnect() {
+    // ResizeObserver mock
+  }
 };
 
 // localStorage 모의 구현
