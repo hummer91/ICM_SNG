@@ -3,15 +3,15 @@
 ## Phase 0: 개발 환경 및 도구 설정 (1일)
 
 ### 0.1 패키지 매니저 및 빌드 도구
-- [ ] pnpm 설치 및 프로젝트 초기화
-- [ ] Vite 설정 (빠른 개발 서버 및 빌드)
-- [ ] TypeScript 설정 (선택사항, 타입 안정성)
+- [x] pnpm 설치 및 프로젝트 초기화
+- [x] Vite 설정 (빠른 개발 서버 및 빌드)
+- [x] TypeScript 설정 (선택사항, 타입 안정성)
 
 ### 0.2 테스트 환경 구축
-- [ ] Vitest 설치 및 설정
-- [ ] Testing Library 통합
-- [ ] Playwright 설정 (E2E 테스트)
-- [ ] 테스트 커버리지 설정
+- [x] Vitest 설치 및 설정
+- [x] Testing Library 통합
+- [x] Playwright 설정 (E2E 테스트)
+- [x] 테스트 커버리지 설정
 
 ### 0.3 코드 품질 도구
 - [ ] ESLint 설정 (코드 스타일)
