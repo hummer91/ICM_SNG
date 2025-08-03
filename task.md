@@ -48,12 +48,12 @@
 - [x] JSDoc 설정 및 템플릿 작성
 - [x] 자동 문서 생성 스크립트
 
-### 0.7 보안 설정
+### 0.7 보안 설정 ✅
 
-- [ ] Content Security Policy (CSP) 설정
-- [ ] XSS 방지를 위한 sanitization 라이브러리
-- [ ] HTTPS 강제 설정
-- [ ] 보안 헤더 설정
+- [x] Content Security Policy (CSP) 설정
+- [x] XSS 방지를 위한 sanitization 라이브러리
+- [x] HTTPS 강제 설정
+- [x] 보안 헤더 설정
 
 ## Phase 1: 기초 설정 (1일)
 

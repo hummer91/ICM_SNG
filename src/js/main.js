@@ -9,6 +9,23 @@ import { initSentry } from '../services/sentry.js';
 import { initAnalytics } from '../services/analytics.js';
 import { initPerformanceMonitoring } from '../services/performance.js';
 import config from '../config/environment.js';
+import { TRUSTED_TYPES_CONFIG } from '../config/security.js';
+
+// 보안 초기화
+function initializeSecurity() {
+  try {
+    // Trusted Types 정책 설정 (지원하는 브라우저에서만)
+    if (window.trustedTypes && window.trustedTypes.createPolicy) {
+      window.trustedTypes.createPolicy('default', TRUSTED_TYPES_CONFIG);
+
+      if (config.debug) {
+        console.info('Trusted Types policy initialized');
+      }
+    }
+  } catch (error) {
+    console.error('Failed to initialize security:', error);
+  }
+}
 
 // 모니터링 서비스 초기화
 function initializeMonitoring() {
@@ -33,6 +50,9 @@ function initializeMonitoring() {
 // 앱 초기화
 document.addEventListener('DOMContentLoaded', () => {
   console.info('ICM SNG 포커 앱 시작');
+
+  // 보안 초기화
+  initializeSecurity();
 
   // 모니터링 서비스 초기화
   initializeMonitoring();
