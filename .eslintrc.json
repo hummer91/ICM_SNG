@@ -74,6 +74,8 @@
     "node_modules/",
     "coverage/",
     "*.min.js",
-    "test-results/"
+    "test-results/",
+    ".storybook/**/*",
+    "scripts/**/*"
   ]
 }

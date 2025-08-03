@@ -1,0 +1,71 @@
+{
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "source": {
+    "include": ["src/js", "README.md"],
+    "exclude": ["src/js/**/*.test.js", "src/js/**/*.stories.js"],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true,
+      "includeDate": false
+    }
+  },
+  "opts": {
+    "destination": "./docs/api",
+    "encoding": "utf8",
+    "private": false,
+    "recurse": true,
+    "template": "node_modules/docdash",
+    "verbose": true
+  },
+  "docdash": {
+    "static": true,
+    "sort": true,
+    "sectionOrder": [
+      "Modules",
+      "Classes",
+      "Namespaces",
+      "Interfaces",
+      "Events",
+      "Mixins"
+    ],
+    "search": true,
+    "collapse": true,
+    "wrap": true,
+    "typedefs": true,
+    "navLevel": 2,
+    "private": false,
+    "removeQuotes": "none",
+    "name": "ICM SNG Poker API",
+    "footer": "ICM SNG Poker Learning App",
+    "meta": {
+      "title": "ICM SNG Poker - API Documentation",
+      "description": "API documentation for ICM SNG Poker Learning App",
+      "keyword": "icm, poker, sng, tournament, api, documentation"
+    },
+    "menu": {
+      "GitHub": {
+        "href": "https://github.com/hummer91/ICM_SNG",
+        "target": "_blank",
+        "class": "menu-item",
+        "id": "github-link"
+      },
+      "Storybook": {
+        "href": "/storybook",
+        "target": "_blank",
+        "class": "menu-item",
+        "id": "storybook-link"
+      }
+    }
+  }
+}

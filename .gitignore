@@ -46,3 +46,8 @@ coverage/
 *.tmp
 *.temp
 .cache/
+
+# Documentation
+docs/api/
+docs/storybook/
+storybook-static/
