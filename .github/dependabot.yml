@@ -1,0 +1,49 @@
+version: 2
+updates:
+  # npm 패키지 업데이트 확인
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "hummer91"
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    # 보안 업데이트는 즉시 적용
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    # 메이저 버전 업데이트는 별도 그룹으로 관리
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
+    ignore:
+      # 특정 의존성 무시 (필요한 경우)
+      # - dependency-name: "package-name"
+      #   versions: ["1.x", "2.x"]
+
+  # GitHub Actions 업데이트 확인
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    labels:
+      - "github-actions"
+      - "automated"
+    commit-message:
+      prefix: "chore"
+      include: "scope"

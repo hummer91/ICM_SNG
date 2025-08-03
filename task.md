@@ -35,12 +35,12 @@
 
 ### 0.5 CI/CD 파이프라인
 
-- [ ] GitHub Actions 설정
-  - [ ] 자동 테스트 실행 (push/PR 시)
-  - [ ] 빌드 검증
-  - [ ] 코드 커버리지 체크
-  - [ ] 배포 자동화 설정
-- [ ] 의존성 취약점 스캔 (Snyk/Dependabot)
+- [x] GitHub Actions 설정
+  - [x] 자동 테스트 실행 (push/PR 시)
+  - [x] 빌드 검증
+  - [x] 코드 커버리지 체크
+  - [x] 배포 자동화 설정
+- [x] 의존성 취약점 스캔 (Snyk/Dependabot)
 
 ### 0.6 문서화 도구
 

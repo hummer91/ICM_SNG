@@ -16,7 +16,10 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "prepare": "husky install",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix",
+    "licenses": "npx license-checker --production --summary"
   },
   "keywords": [
     "poker",

@@ -1,0 +1,200 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  coverage:
+    name: Code Coverage Check
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Check coverage thresholds
+        run: |
+          COVERAGE=$(npm run test:coverage -- --reporter=json-summary 2>/dev/null | grep -oP '"total":\s*\{\s*"lines":\s*\{\s*"pct":\s*\K[0-9.]+' || echo "0")
+          echo "Coverage: ${COVERAGE}%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Coverage is below 80% threshold"
+            exit 1
+          fi
+
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
+            const totalCoverage = coverage.total;
+            
+            const comment = `## 📊 Coverage Report
+            
+            | Type | Coverage | Details |
+            |------|----------|---------|
+            | Statements | ${totalCoverage.statements.pct}% | ${totalCoverage.statements.covered}/${totalCoverage.statements.total} |
+            | Branches | ${totalCoverage.branches.pct}% | ${totalCoverage.branches.covered}/${totalCoverage.branches.total} |
+            | Functions | ${totalCoverage.functions.pct}% | ${totalCoverage.functions.covered}/${totalCoverage.functions.total} |
+            | Lines | ${totalCoverage.lines.pct}% | ${totalCoverage.lines.covered}/${totalCoverage.lines.total} |
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  performance:
+    name: Performance Budget Check
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Check bundle size
+        run: |
+          # Check JavaScript bundle size
+          JS_SIZE=$(find dist -name "*.js" -exec du -cb {} + | grep total$ | awk '{print $1}')
+          JS_SIZE_KB=$((JS_SIZE / 1024))
+          echo "JavaScript bundle size: ${JS_SIZE_KB}KB"
+          
+          # Check CSS bundle size
+          CSS_SIZE=$(find dist -name "*.css" -exec du -cb {} + | grep total$ | awk '{print $1}')
+          CSS_SIZE_KB=$((CSS_SIZE / 1024))
+          echo "CSS bundle size: ${CSS_SIZE_KB}KB"
+          
+          # Check against budget (500KB for JS, 50KB for CSS)
+          if [ $JS_SIZE_KB -gt 500 ]; then
+            echo "❌ JavaScript bundle size exceeds budget (500KB)"
+            exit 1
+          fi
+          
+          if [ $CSS_SIZE_KB -gt 50 ]; then
+            echo "❌ CSS bundle size exceeds budget (50KB)"
+            exit 1
+          fi
+          
+          echo "✅ Bundle sizes are within budget"
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+
+  all-checks:
+    name: All Checks Passed
+    needs: [lint, test, build, coverage, performance, security]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Success
+        run: echo "All CI checks passed successfully!"

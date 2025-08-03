@@ -1,0 +1,137 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_SENTRY_ENVIRONMENT: production
+          VITE_POSTHOG_API_KEY: ${{ secrets.VITE_POSTHOG_API_KEY }}
+
+      - name: Create deployment package
+        run: |
+          # Create deployment directory
+          mkdir -p deploy
+          
+          # Copy built files
+          cp -r dist/* deploy/
+          
+          # Copy server configuration files if any
+          if [ -f "nginx.conf" ]; then
+            cp nginx.conf deploy/
+          fi
+          
+          # Create deployment info file
+          echo "Deployment Info" > deploy/DEPLOY_INFO.txt
+          echo "===============" >> deploy/DEPLOY_INFO.txt
+          echo "Commit: ${{ github.sha }}" >> deploy/DEPLOY_INFO.txt
+          echo "Branch: ${{ github.ref_name }}" >> deploy/DEPLOY_INFO.txt
+          echo "Time: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> deploy/DEPLOY_INFO.txt
+          echo "Build Number: ${{ github.run_number }}" >> deploy/DEPLOY_INFO.txt
+
+      - name: Deploy to server (Example - Replace with your deployment method)
+        run: |
+          echo "This is where you would deploy to your server"
+          echo "Options:"
+          echo "1. Use rsync over SSH"
+          echo "2. Upload to S3 + CloudFront"
+          echo "3. Deploy to Netlify/Vercel"
+          echo "4. Use FTP/SFTP"
+          echo "5. Deploy to your VPS"
+          
+          # Example rsync deployment (commented out)
+          # rsync -avz --delete \
+          #   -e "ssh -o StrictHostKeyChecking=no" \
+          #   deploy/ \
+          #   ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}
+
+      - name: Upload deployment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package
+          path: deploy/
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: github.event_name == 'push'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: |
+            ## 🚀 Deployment Information
+            
+            - **Commit**: ${{ github.sha }}
+            - **Build**: #${{ github.run_number }}
+            - **Time**: ${{ github.event.head_commit.timestamp }}
+            
+            ### Changes
+            ${{ github.event.head_commit.message }}
+          draft: false
+          prerelease: false
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+            # Here you could send notifications via Slack, Discord, email, etc.
+          else
+            echo "❌ Deployment failed!"
+            # Send failure notifications
+          fi
+
+  post-deploy-checks:
+    name: Post-Deployment Verification
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check deployment health
+        run: |
+          echo "Checking if the deployed application is healthy..."
+          # Add your health check logic here
+          # Example:
+          # curl -f https://your-app-url.com/health || exit 1
+          
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests on production..."
+          # Add basic smoke tests to verify critical functionality
+          
+      - name: Check performance metrics
+        run: |
+          echo "Checking Core Web Vitals on production..."
+          # You could use tools like Lighthouse CI here
