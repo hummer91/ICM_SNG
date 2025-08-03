@@ -1,0 +1,440 @@
+/**
+ * 게임 관련 스타일
+ */
+
+/* 게임 컨테이너 */
+.game-container {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--spacing-6);
+  height: calc(100vh - 80px);
+  padding: var(--spacing-4);
+}
+
+/* 테이블 섹션 */
+.table-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.poker-table-container {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 1;
+  position: relative;
+}
+
+/* 포커 테이블 */
+.poker-table {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.table-felt {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
+  border-radius: 50%;
+  position: relative;
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(0, 0, 0, 0.3);
+}
+
+.table-edge {
+  position: absolute;
+  inset: 10px;
+  border: 8px solid #3c2415;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.3),
+    0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.table-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+/* 팟 표시 */
+.pot-display {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3) var(--spacing-4);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.pot-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.pot-amount {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+/* 플레이어 컨테이너 */
+.players-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 플레이어 카드 */
+.player-card {
+  pointer-events: all;
+  transition: all var(--duration-200) var(--ease-out);
+  cursor: pointer;
+}
+
+.player-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.player-card.active {
+  border-color: var(--brand-purple);
+  box-shadow: 0 0 0 2px var(--brand-purple);
+}
+
+.player-info {
+  padding: var(--spacing-3);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.player-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.player-position {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+.player-chips {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-1);
+}
+
+.chip-count {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--brand-purple);
+}
+
+.chip-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* 딜러 버튼 */
+.dealer-button {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: 2px solid #333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #333;
+  box-shadow: var(--shadow-md);
+  transition: all var(--duration-300) var(--ease-out);
+  pointer-events: none;
+}
+
+/* 컨트롤 섹션 */
+.control-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  overflow-y: auto;
+}
+
+.control-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* ICM 정보 카드 */
+.icm-info-card {
+  background: var(--bg-secondary);
+}
+
+.icm-content {
+  padding: var(--spacing-4);
+}
+
+.icm-header h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-3);
+}
+
+.icm-values {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+.icm-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icm-label {
+  color: var(--text-secondary);
+}
+
+.icm-value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* 지급 정보 */
+.payouts h4 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-2);
+  color: var(--text-secondary);
+}
+
+.payout-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.payout-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-1) 0;
+}
+
+.place {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+.amount {
+  color: var(--text-primary);
+}
+
+/* 액션 컨트롤 */
+.action-control-card {
+  background: var(--bg-secondary);
+}
+
+.action-control-card .card-content {
+  padding: var(--spacing-4);
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+}
+
+.action-buttons button {
+  height: 60px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.all-in-button {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, var(--brand-purple) 0%, #7c3aed 100%);
+}
+
+/* Push/Fold 추천 */
+.push-fold-recommendation {
+  border-top: 1px solid var(--border-primary);
+  padding-top: var(--spacing-4);
+}
+
+.push-fold-recommendation h4 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-3);
+  color: var(--text-secondary);
+}
+
+.recommendation-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.recommendation-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recommendation-label {
+  color: var(--text-secondary);
+}
+
+.recommendation-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.recommendation-value.push {
+  color: var(--success);
+}
+
+.recommendation-value.fold {
+  color: var(--error);
+}
+
+.hand-range {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.range-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.range-value {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  padding: var(--spacing-2);
+  border-radius: var(--radius-sm);
+  word-break: break-all;
+}
+
+/* 헤더 스타일 업데이트 */
+.app-header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  padding: var(--spacing-4) var(--spacing-6);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.app-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.app-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-150) var(--ease-out);
+}
+
+.icon-button:hover {
+  background: var(--bg-quaternary);
+  color: var(--text-primary);
+  border-color: var(--border-secondary);
+}
+
+.icon-button:active {
+  transform: scale(0.95);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .game-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  .control-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .app-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .control-section {
+    grid-template-columns: 1fr;
+  }
+
+  .poker-table-container {
+    max-width: 100%;
+  }
+}

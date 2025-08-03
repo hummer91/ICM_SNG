@@ -11,6 +11,9 @@ import { initPerformanceMonitoring } from '../services/performance.js';
 import config from '../config/environment.js';
 import { TRUSTED_TYPES_CONFIG } from '../config/security.js';
 
+// UI 컴포넌트 임포트
+import { initializeGameLayout } from './ui/views/gameLayout.js';
+
 // 보안 초기화
 function initializeSecurity() {
   try {
@@ -68,22 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }
 
-  // 앱 컨테이너에 기본 콘텐츠 추가
-  const app = document.getElementById('app');
-  app.innerHTML += `
-        <header class="app-header">
-            <h1>ICM SNG 포커 전략</h1>
-            <p class="subtitle">6인 토너먼트 Push/Fold 최적화</p>
-        </header>
-        
-        <main class="app-main">
-            <div class="container">
-                <p>앱이 성공적으로 로드되었습니다!</p>
-                <p>Vite + pnpm 개발 환경이 구성되었습니다.</p>
-                ${config.debug ? '<p class="debug-info">디버그 모드 활성화됨</p>' : ''}
-            </div>
-        </main>
-    `;
+  // 게임 레이아웃 초기화
+  initializeGameLayout();
 });
 
 // HMR (Hot Module Replacement) 지원

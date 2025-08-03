@@ -1,14 +1,10 @@
 import { defineConfig } from 'vite';
 import legacy from '@vitejs/plugin-legacy';
 import { resolve } from 'path';
-import { viteSecurityPlugin } from './server-config/vite-security.js';
 
 export default defineConfig({
   // 플러그인 설정
   plugins: [
-    // 보안 헤더 플러그인
-    viteSecurityPlugin(),
-
     // 구형 브라우저 지원
     legacy({
       targets: ['defaults', 'not IE 11'],

@@ -3,6 +3,10 @@
  * Linear 디자인 시스템 기반
  */
 
+/* 컴포넌트 스타일 임포트 */
+@import './components.css';
+@import './game.css';
+
 /* CSS 변수 정의 - Linear 디자인 시스템 */
 :root {
   /* 색상 - 배경 */
@@ -10,38 +14,91 @@
   --bg-secondary: rgb(16, 17, 18);
   --bg-tertiary: rgb(24, 25, 26);
   --bg-overlay: rgba(10, 10, 10, 0.8);
-  
+
   /* 색상 - 텍스트 */
   --text-primary: rgb(247, 248, 248);
   --text-secondary: rgb(174, 177, 183);
   --text-tertiary: rgb(138, 143, 152);
   --text-muted: rgb(93, 95, 101);
-  
+
   /* 색상 - 테두리 */
   --border-primary: rgb(33, 35, 38);
   --border-secondary: rgba(247, 248, 248, 0.08);
   --border-focus: rgba(94, 106, 210, 0.5);
-  
+
   /* 색상 - 브랜드 */
   --brand-purple: #5e6ad2;
   --brand-blue: #26b5ce;
   --brand-pink: #f02e65;
-  
+
   /* 색상 - 시맨틱 */
   --success: #4cb782;
   --warning: #f2c94c;
   --error: #eb5757;
   --info: #4ea7fc;
-  
+
   /* 폰트 */
-  --font-sans: "Inter", -apple-system, "system-ui", "Segoe UI", Roboto, sans-serif;
-  --font-mono: "SF Mono", Monaco, Consolas, "Courier New", monospace;
-  
+  --font-sans: 'Inter', -apple-system, 'system-ui', 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+
   /* 애니메이션 */
+  --duration-150: 150ms;
+  --duration-200: 200ms;
+  --duration-300: 300ms;
   --duration-fast: 150ms;
   --duration-normal: 200ms;
   --duration-slow: 300ms;
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* 폰트 크기 */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  /* 폰트 굵기 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* 간격 */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+
+  /* 반경 */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+
+  /* 그림자 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* 추가 배경색 */
+  --bg-quaternary: rgb(32, 34, 37);
+  --bg-hover: rgba(247, 248, 248, 0.05);
+  --bg-active: rgba(247, 248, 248, 0.1);
 }
 
 /* 전역 스타일 리셋 */
@@ -52,6 +109,10 @@
 }
 
 /* 기본 스타일 */
+html {
+  font-size: 16px;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-primary);
@@ -59,6 +120,27 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 앱 컨테이너 */
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 메인 콘텐츠 */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 포커 앱 바디 클래스 */
+body.poker-app {
+  overflow: hidden;
 }
 
 /* 로딩 화면 */
@@ -93,7 +175,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* 앱 헤더 */
@@ -134,8 +218,18 @@ body {
 }
 
 /* 유틸리티 클래스 */
-.text-primary { color: var(--text-primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-success { color: var(--success); }
-.text-error { color: var(--error); }
-.text-warning { color: var(--warning); }
+.text-primary {
+  color: var(--text-primary);
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
+.text-success {
+  color: var(--success);
+}
+.text-error {
+  color: var(--error);
+}
+.text-warning {
+  color: var(--warning);
+}

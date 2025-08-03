@@ -26,7 +26,11 @@ export function securityMiddleware(req, res, next) {
   });
 
   // HTTPS 리다이렉션 (개발 환경에서는 선택적)
-  if (process.env.VITE_FORCE_HTTPS === 'true' && req.headers['x-forwarded-proto'] === 'http') {
+  if (
+    process.env.VITE_FORCE_HTTPS === 'true' &&
+    req.headers &&
+    req.headers['x-forwarded-proto'] === 'http'
+  ) {
     const httpsUrl = `https://${req.headers.host}${req.url}`;
     res.writeHead(301, { Location: httpsUrl });
     res.end();
