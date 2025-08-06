@@ -2,7 +2,7 @@
  * PostHog 사용자 분석 서비스
  */
 
-import posthog from 'posthog-js';
+// PostHog는 CDN을 통해 전역으로 로드됨
 import {
   POSTHOG_API_KEY,
   POSTHOG_HOST,
@@ -16,15 +16,15 @@ import {
  * PostHog 초기화
  */
 export function initAnalytics() {
-  if (!enableAnalytics || !POSTHOG_API_KEY) {
+  if (!enableAnalytics || !POSTHOG_API_KEY || typeof window.posthog === 'undefined') {
     if (debug) {
-      console.info('Analytics is disabled or API key not provided');
+      console.info('Analytics is disabled, API key not provided, or PostHog not loaded');
     }
     return;
   }
 
   try {
-    posthog.init(POSTHOG_API_KEY, {
+    window.posthog.init(POSTHOG_API_KEY, {
       api_host: POSTHOG_HOST,
       // 개인정보 보호 설정
       autocapture: false, // 자동 캡처 비활성화 (명시적 추적만)
@@ -50,7 +50,7 @@ export function initAnalytics() {
 
     // 익명 사용자 ID 설정
     const userId = getAnonymousUserId();
-    posthog.identify(userId);
+    window.posthog.identify(userId);
 
     console.info('PostHog analytics initialized');
   } catch (error) {
@@ -77,7 +77,7 @@ function getAnonymousUserId() {
  * 이벤트 추적
  */
 export function trackEvent(eventName, properties = {}) {
-  if (!enableAnalytics) {
+  if (!enableAnalytics || typeof window.posthog === 'undefined') {
     if (debug) {
       console.info('Analytics event (disabled):', eventName, properties);
     }
@@ -85,7 +85,7 @@ export function trackEvent(eventName, properties = {}) {
   }
 
   try {
-    posthog.capture(eventName, {
+    window.posthog.capture(eventName, {
       ...properties,
       timestamp: new Date().toISOString(),
     });
@@ -98,12 +98,12 @@ export function trackEvent(eventName, properties = {}) {
  * 사용자 속성 설정
  */
 export function setUserProperties(properties) {
-  if (!enableAnalytics) {
+  if (!enableAnalytics || typeof window.posthog === 'undefined') {
     return;
   }
 
   try {
-    posthog.people.set(properties);
+    window.posthog.people.set(properties);
   } catch (error) {
     console.error('Failed to set user properties:', error);
   }
@@ -113,12 +113,12 @@ export function setUserProperties(properties) {
  * 페이지뷰 추적
  */
 export function trackPageView(pageName, properties = {}) {
-  if (!enableAnalytics) {
+  if (!enableAnalytics || typeof window.posthog === 'undefined') {
     return;
   }
 
   try {
-    posthog.capture('$pageview', {
+    window.posthog.capture('$pageview', {
       $current_url: window.location.href,
       $host: window.location.host,
       $pathname: window.location.pathname,
@@ -188,12 +188,12 @@ export const GameAnalytics = {
  * 분석 서비스 종료
  */
 export function shutdownAnalytics() {
-  if (!enableAnalytics) {
+  if (!enableAnalytics || typeof window.posthog === 'undefined') {
     return;
   }
 
   try {
-    posthog.capture('app_shutdown', {
+    window.posthog.capture('app_shutdown', {
       timestamp: Date.now(),
     });
   } catch (error) {

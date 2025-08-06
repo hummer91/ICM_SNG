@@ -2,20 +2,20 @@
  * 환경별 설정 관리
  */
 
-// 환경 변수 타입 정의
+// 환경 변수 타입 정의 (Vanilla JS 환경에서는 기본값 사용)
 const ENV_VARS = {
-  NODE_ENV: import.meta.env.MODE || 'development',
-  SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN || '',
-  SENTRY_ENVIRONMENT: import.meta.env.VITE_SENTRY_ENVIRONMENT || 'development',
-  SENTRY_RELEASE: import.meta.env.VITE_SENTRY_RELEASE || '1.0.0',
-  POSTHOG_API_KEY: import.meta.env.VITE_POSTHOG_API_KEY || '',
-  POSTHOG_HOST: import.meta.env.VITE_POSTHOG_HOST || 'https://app.posthog.com',
-  APP_NAME: import.meta.env.VITE_APP_NAME || 'ICM SNG Poker',
-  APP_VERSION: import.meta.env.VITE_APP_VERSION || '1.0.0',
-  API_URL: import.meta.env.VITE_API_URL || '/api',
-  PERF_LCP_BUDGET: parseInt(import.meta.env.VITE_PERF_LCP_BUDGET || '2500', 10),
-  PERF_FID_BUDGET: parseInt(import.meta.env.VITE_PERF_FID_BUDGET || '100', 10),
-  PERF_CLS_BUDGET: parseFloat(import.meta.env.VITE_PERF_CLS_BUDGET || '0.1'),
+  NODE_ENV: 'development',
+  SENTRY_DSN: '',
+  SENTRY_ENVIRONMENT: 'development',
+  SENTRY_RELEASE: '1.0.0',
+  POSTHOG_API_KEY: '',
+  POSTHOG_HOST: 'https://app.posthog.com',
+  APP_NAME: 'ICM SNG Poker',
+  APP_VERSION: '1.0.0',
+  API_URL: '/api',
+  PERF_LCP_BUDGET: 2500,
+  PERF_FID_BUDGET: 100,
+  PERF_CLS_BUDGET: 0.1,
 };
 
 // 환경별 설정

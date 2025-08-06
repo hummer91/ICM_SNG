@@ -1,0 +1,462 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "6인 SNG Nash Equilibrium Push/Fold 범위 데이터",
+    "source": "ICM SNG Poker App - 기본 구현",
+    "lastUpdated": "2024-01-01",
+    "note": "이 데이터는 기본 구현으로, 실제 게임에서는 검증된 솔버 데이터 사용 권장"
+  },
+  "positions": {
+    "BTN": {
+      "description": "Button position - 가장 유리한 포지션",
+      "ranges": {
+        "2bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+", "72+", "62+", "52+", "42+", "32+"],
+          "percentage": 100,
+          "note": "극도로 짧은 스택, 거의 모든 핸드"
+        },
+        "3bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+", "72+", "62+", "52+"],
+          "percentage": 85,
+          "note": "매우 넓은 범위"
+        },
+        "4bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+", "72+"],
+          "percentage": 75,
+          "note": "넓은 범위"
+        },
+        "5bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+"],
+          "percentage": 65,
+          "note": "여전히 넓은 범위"
+        },
+        "6bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+"],
+          "percentage": 58,
+          "note": "중간-넓은 범위"
+        },
+        "8bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+"],
+          "percentage": 48,
+          "note": "중간 범위"
+        },
+        "10bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J3+", "T5+", "95+"],
+          "percentage": 38,
+          "note": "중간-타이트 범위"
+        },
+        "12bb": {
+          "push": ["22+", "A2+", "K2+", "Q4+", "J6+", "T7+", "97+"],
+          "percentage": 28,
+          "note": "타이트 범위"
+        },
+        "15bb": {
+          "push": ["22+", "A2+", "K5+", "Q8+", "J9+", "T9+"],
+          "percentage": 20,
+          "note": "매우 타이트한 범위"
+        },
+        "20bb": {
+          "push": ["55+", "A8+", "K9+", "QT+", "JT+"],
+          "percentage": 12,
+          "note": "프리미엄 핸드 위주"
+        }
+      }
+    },
+    "SB": {
+      "description": "Small Blind - BB와 헤즈업 상황",
+      "ranges": {
+        "2bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+", "72+", "62+", "52+"],
+          "percentage": 85,
+          "note": "헤즈업이므로 매우 넓게"
+        },
+        "3bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+"],
+          "percentage": 70,
+          "note": "넓은 범위"
+        },
+        "4bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+"],
+          "percentage": 62,
+          "note": "중간-넓은 범위"
+        },
+        "5bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+"],
+          "percentage": 55,
+          "note": "중간 범위"
+        },
+        "6bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J4+", "T7+"],
+          "percentage": 48,
+          "note": "중간 범위"
+        },
+        "8bb": {
+          "push": ["22+", "A2+", "K2+", "Q6+", "J8+", "T8+"],
+          "percentage": 38,
+          "note": "중간-타이트 범위"
+        },
+        "10bb": {
+          "push": ["22+", "A2+", "K4+", "Q8+", "J9+", "T9+"],
+          "percentage": 28,
+          "note": "타이트 범위"
+        },
+        "12bb": {
+          "push": ["22+", "A2+", "K7+", "QT+", "JT+"],
+          "percentage": 22,
+          "note": "타이트 범위"
+        },
+        "15bb": {
+          "push": ["33+", "A5+", "K9+", "QT+", "JT+"],
+          "percentage": 18,
+          "note": "매우 타이트한 범위"
+        },
+        "20bb": {
+          "push": ["66+", "A9+", "KT+", "QT+"],
+          "percentage": 12,
+          "note": "프리미엄 핸드"
+        }
+      }
+    },
+    "BB": {
+      "description": "Big Blind - 이미 블라인드 투자, 상대적으로 타이트",
+      "ranges": {
+        "2bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+"],
+          "percentage": 70,
+          "note": "블라인드 방어, 넓은 범위"
+        },
+        "3bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+"],
+          "percentage": 62,
+          "note": "중간-넓은 범위"
+        },
+        "4bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J3+", "T6+"],
+          "percentage": 55,
+          "note": "중간 범위"
+        },
+        "5bb": {
+          "push": ["22+", "A2+", "K2+", "Q4+", "J7+", "T8+"],
+          "percentage": 48,
+          "note": "중간 범위"
+        },
+        "6bb": {
+          "push": ["22+", "A2+", "K3+", "Q7+", "J8+", "T9+"],
+          "percentage": 42,
+          "note": "중간-타이트 범위"
+        },
+        "8bb": {
+          "push": ["22+", "A2+", "K6+", "Q9+", "JT+"],
+          "percentage": 32,
+          "note": "타이트 범위"
+        },
+        "10bb": {
+          "push": ["22+", "A3+", "K8+", "QT+", "JT+"],
+          "percentage": 25,
+          "note": "타이트 범위"
+        },
+        "12bb": {
+          "push": ["22+", "A5+", "KT+", "QT+"],
+          "percentage": 20,
+          "note": "매우 타이트한 범위"
+        },
+        "15bb": {
+          "push": ["44+", "A7+", "KT+", "QT+"],
+          "percentage": 15,
+          "note": "매우 타이트한 범위"
+        },
+        "20bb": {
+          "push": ["77+", "AT+", "KQ+"],
+          "percentage": 10,
+          "note": "프리미엄 핸드만"
+        }
+      }
+    },
+    "UTG": {
+      "description": "Under The Gun - 가장 불리한 포지션",
+      "ranges": {
+        "2bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T6+", "96+"],
+          "percentage": 60,
+          "note": "얼리 포지션이므로 상대적으로 타이트"
+        },
+        "3bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J5+", "T8+"],
+          "percentage": 50,
+          "note": "중간 범위"
+        },
+        "4bb": {
+          "push": ["22+", "A2+", "K2+", "Q6+", "J8+", "T9+"],
+          "percentage": 42,
+          "note": "중간-타이트 범위"
+        },
+        "5bb": {
+          "push": ["22+", "A2+", "K4+", "Q8+", "J9+", "T9+"],
+          "percentage": 35,
+          "note": "타이트 범위"
+        },
+        "6bb": {
+          "push": ["22+", "A2+", "K6+", "Q9+", "JT+"],
+          "percentage": 30,
+          "note": "타이트 범위"
+        },
+        "8bb": {
+          "push": ["22+", "A3+", "K8+", "QT+", "JT+"],
+          "percentage": 25,
+          "note": "매우 타이트한 범위"
+        },
+        "10bb": {
+          "push": ["22+", "A5+", "KT+", "QT+"],
+          "percentage": 20,
+          "note": "매우 타이트한 범위"
+        },
+        "12bb": {
+          "push": ["33+", "A7+", "KJ+", "QJ+"],
+          "percentage": 16,
+          "note": "매우 타이트한 범위"
+        },
+        "15bb": {
+          "push": ["55+", "A9+", "KQ+"],
+          "percentage": 12,
+          "note": "프리미엄 핸드 위주"
+        },
+        "20bb": {
+          "push": ["88+", "AJ+", "KQ+"],
+          "percentage": 8,
+          "note": "프리미엄 핸드만"
+        }
+      }
+    },
+    "MP": {
+      "description": "Middle Position - 중간 포지션",
+      "ranges": {
+        "2bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T4+", "94+"],
+          "percentage": 65,
+          "note": "UTG보다 약간 넓은 범위"
+        },
+        "3bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J3+", "T7+"],
+          "percentage": 55,
+          "note": "중간-넓은 범위"
+        },
+        "4bb": {
+          "push": ["22+", "A2+", "K2+", "Q4+", "J7+", "T8+"],
+          "percentage": 48,
+          "note": "중간 범위"
+        },
+        "5bb": {
+          "push": ["22+", "A2+", "K3+", "Q7+", "J8+", "T9+"],
+          "percentage": 40,
+          "note": "중간-타이트 범위"
+        },
+        "6bb": {
+          "push": ["22+", "A2+", "K5+", "Q8+", "J9+", "T9+"],
+          "percentage": 35,
+          "note": "타이트 범위"
+        },
+        "8bb": {
+          "push": ["22+", "A2+", "K7+", "Q9+", "JT+"],
+          "percentage": 28,
+          "note": "타이트 범위"
+        },
+        "10bb": {
+          "push": ["22+", "A4+", "K9+", "QT+", "JT+"],
+          "percentage": 22,
+          "note": "매우 타이트한 범위"
+        },
+        "12bb": {
+          "push": ["22+", "A6+", "KT+", "QT+"],
+          "percentage": 18,
+          "note": "매우 타이트한 범위"
+        },
+        "15bb": {
+          "push": ["44+", "A8+", "KJ+", "QJ+"],
+          "percentage": 14,
+          "note": "매우 타이트한 범위"
+        },
+        "20bb": {
+          "push": ["77+", "AT+", "KQ+"],
+          "percentage": 10,
+          "note": "프리미엄 핸드만"
+        }
+      }
+    },
+    "CO": {
+      "description": "Cut Off - BTN 다음으로 유리한 포지션",
+      "ranges": {
+        "2bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+", "72+"],
+          "percentage": 78,
+          "note": "레이트 포지션 어드밴티지"
+        },
+        "3bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+"],
+          "percentage": 68,
+          "note": "넓은 범위"
+        },
+        "4bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J2+", "T4+", "95+"],
+          "percentage": 60,
+          "note": "중간-넓은 범위"
+        },
+        "5bb": {
+          "push": ["22+", "A2+", "K2+", "Q2+", "J6+", "T7+"],
+          "percentage": 52,
+          "note": "중간 범위"
+        },
+        "6bb": {
+          "push": ["22+", "A2+", "K2+", "Q5+", "J8+", "T9+"],
+          "percentage": 45,
+          "note": "중간 범위"
+        },
+        "8bb": {
+          "push": ["22+", "A2+", "K4+", "Q8+", "J9+", "T9+"],
+          "percentage": 35,
+          "note": "중간-타이트 범위"
+        },
+        "10bb": {
+          "push": ["22+", "A2+", "K7+", "Q9+", "JT+"],
+          "percentage": 28,
+          "note": "타이트 범위"
+        },
+        "12bb": {
+          "push": ["22+", "A4+", "K9+", "QT+", "JT+"],
+          "percentage": 22,
+          "note": "타이트 범위"
+        },
+        "15bb": {
+          "push": ["33+", "A6+", "KT+", "QT+"],
+          "percentage": 18,
+          "note": "매우 타이트한 범위"
+        },
+        "20bb": {
+          "push": ["66+", "A9+", "KJ+", "QJ+"],
+          "percentage": 12,
+          "note": "프리미엄 핸드 위주"
+        }
+      }
+    }
+  },
+  "calling_ranges": {
+    "description": "Push에 대한 콜링 범위 (ICM 고려)",
+    "BB_vs_SB": {
+      "2bb": {
+        "call": ["22+", "A2+", "K2+", "Q2+", "J2+", "T2+", "92+", "82+"],
+        "percentage": 70,
+        "note": "헤즈업, 넓게 콜"
+      },
+      "3bb": {
+        "call": ["22+", "A2+", "K2+", "Q2+", "J4+", "T7+"],
+        "percentage": 55,
+        "note": "중간-넓은 범위"
+      },
+      "5bb": {
+        "call": ["22+", "A2+", "K5+", "Q8+", "J9+"],
+        "percentage": 40,
+        "note": "중간-타이트 범위"
+      },
+      "8bb": {
+        "call": ["22+", "A4+", "K8+", "QT+"],
+        "percentage": 28,
+        "note": "타이트 범위"
+      },
+      "10bb": {
+        "call": ["22+", "A6+", "KT+", "QT+"],
+        "percentage": 22,
+        "note": "매우 타이트한 범위"
+      },
+      "15bb": {
+        "call": ["44+", "A8+", "KJ+"],
+        "percentage": 15,
+        "note": "매우 타이트한 범위"
+      },
+      "20bb": {
+        "call": ["77+", "AT+", "KQ+"],
+        "percentage": 10,
+        "note": "프리미엄 핸드만"
+      }
+    },
+    "BB_vs_BTN": {
+      "2bb": {
+        "call": ["22+", "A2+", "K2+", "Q2+", "J2+", "T4+"],
+        "percentage": 58,
+        "note": "BTN 레인지가 넓으므로 넓게 콜"
+      },
+      "3bb": {
+        "call": ["22+", "A2+", "K2+", "Q5+", "J7+"],
+        "percentage": 45,
+        "note": "중간 범위"
+      },
+      "5bb": {
+        "call": ["22+", "A2+", "K7+", "Q9+", "JT+"],
+        "percentage": 32,
+        "note": "타이트 범위"
+      },
+      "8bb": {
+        "call": ["22+", "A5+", "KT+", "QT+"],
+        "percentage": 22,
+        "note": "매우 타이트한 범위"
+      },
+      "10bb": {
+        "call": ["33+", "A7+", "KJ+"],
+        "percentage": 18,
+        "note": "매우 타이트한 범위"
+      },
+      "15bb": {
+        "call": ["55+", "A9+", "KQ+"],
+        "percentage": 12,
+        "note": "프리미엄 핸드 위주"
+      },
+      "20bb": {
+        "call": ["88+", "AJ+", "KQ+"],
+        "percentage": 8,
+        "note": "프리미엄 핸드만"
+      }
+    }
+  },
+  "icm_adjustments": {
+    "description": "ICM 상황에 따른 범위 조정 팩터",
+    "bubble_factor": {
+      "high_pressure": 0.7,
+      "medium_pressure": 0.85,
+      "low_pressure": 1.0,
+      "note": "ICM 압박이 클수록 범위를 줄임"
+    },
+    "chip_leader": {
+      "factor": 1.2,
+      "note": "칩 리더는 압박을 가할 수 있으므로 범위 확장"
+    },
+    "short_stack": {
+      "factor": 0.8,
+      "note": "짧은 스택은 생존이 중요하므로 범위 축소"
+    },
+    "multiple_opponents": {
+      "two_opponents": 0.75,
+      "three_or_more": 0.6,
+      "note": "상대가 많을수록 범위 축소"
+    }
+  },
+  "hand_rankings": {
+    "description": "핸드 순위 (강한 순서대로)",
+    "premium": ["AA", "KK", "QQ", "AKs", "JJ"],
+    "strong": ["AQs", "KQs", "AJs", "KJs", "TT", "AKo"],
+    "medium": ["ATs", "QJs", "KTs", "QTs", "JTs", "99", "AQo", "A9s"],
+    "weak": ["88", "K9s", "T9s", "A8s", "Q9s", "J9s", "AJo", "77"],
+    "marginal": ["A7s", "A6s", "A5s", "A4s", "A3s", "A2s", "KQo", "66", "55"],
+    "trash": ["K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s", "44", "33", "22"]
+  },
+  "notes": {
+    "implementation": "이 범위들은 기본 가이드라인입니다. 실제 게임에서는 다음 요소들을 고려해야 합니다:",
+    "considerations": [
+      "상대방의 콜링 범위 텐던시",
+      "ICM 상황 (버블, 상금 구조)",
+      "플레이어별 어그레션 레벨",
+      "이전 핸드 히스토리",
+      "테이블 다이나믹스",
+      "안테 유무",
+      "블라인드 상승 구조"
+    ],
+    "disclaimer": "이 데이터는 교육 목적으로 제작되었으며, 실제 게임에서는 검증된 솔버 데이터 사용을 권장합니다."
+  }
+}

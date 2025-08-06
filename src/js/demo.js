@@ -2,11 +2,20 @@
  * 컴포넌트 데모 페이지 스크립트
  */
 
-import { Button, Input, Card, Modal, Toast, Theme, RangeChart } from './components/index.js';
+import {
+  Button,
+  Input,
+  Card,
+  Modal,
+  Toast,
+  Theme,
+  RangeChart,
+  PokerTable,
+} from './components/index.js';
 
 // 데모 페이지 초기화
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('컴포넌트 데모 페이지 초기화');
+  // console.log('컴포넌트 데모 페이지 초기화');
 
   // 색상 데모
   renderColorDemo();
@@ -31,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 레인지 차트 데모
   renderRangeChartDemo();
+
+  // 포커 테이블 데모
+  renderPokerTableDemo();
 
   // 포커 UI 데모
   renderPokerDemo();
@@ -402,7 +414,7 @@ function renderModalDemo() {
           title: '알림',
           message: '작업이 성공적으로 완료되었습니다!',
           buttonText: '확인',
-          onClose: () => console.log('알림 닫힘'),
+          onClose: () => {}, // console.log('알림 닫힘'),
         });
       },
     }),
@@ -539,6 +551,158 @@ function renderRangeChartDemo() {
 }
 
 /**
+ * 포커 테이블 데모
+ */
+function renderPokerTableDemo() {
+  // 기본 테이블
+  const basicContainer = document.querySelector('.pokertable-demo-basic');
+  if (basicContainer) {
+    const basicTable = PokerTable.create();
+    basicContainer.appendChild(basicTable.element);
+  }
+
+  // 플레이어가 있는 테이블
+  const playersContainer = document.querySelector('.pokertable-demo-players');
+  if (playersContainer) {
+    const playersTable = PokerTable.create({
+      players: [
+        { name: 'Alice', stack: 1500 },
+        { name: 'Bob', stack: 1200 },
+        { name: 'Charlie', stack: 1800 },
+      ],
+      dealerSeat: 0,
+    });
+    playersContainer.appendChild(playersTable.element);
+  }
+
+  // 게임 진행 중 테이블
+  const activeContainer = document.querySelector('.pokertable-demo-active');
+  let activeTable;
+  if (activeContainer) {
+    activeTable = PokerTable.create({
+      players: [
+        { name: 'Player 1', stack: 1200, status: 'ACTIVE' },
+        { name: 'Player 2', stack: 800, status: 'FOLDED' },
+        { name: 'Player 3', stack: 0, status: 'ALL_IN' },
+        { name: 'Player 4', stack: 1500, status: 'ACTIVE' },
+        { name: 'Player 5', stack: 900, status: 'ACTIVE' },
+        { name: 'Player 6', stack: 600, status: 'FOLDED' },
+      ],
+      dealerSeat: 2,
+      activeSeat: 3,
+    });
+
+    // 초기 상태 설정
+    activeTable.updatePot(350);
+    activeTable.updateBlinds(3, 75, 150);
+    activeTable.showPlayerBet(0, 150);
+    activeTable.showPlayerBet(3, 200);
+
+    activeContainer.appendChild(activeTable.element);
+  }
+
+  // 데모 컨트롤 이벤트 설정
+  setupPokerTableControls(activeTable);
+}
+
+/**
+ * 포커 테이블 데모 컨트롤 설정
+ */
+function setupPokerTableControls(activeTable) {
+  if (!activeTable) {
+    return;
+  }
+
+  const addPlayerBtn = document.getElementById('add-random-player');
+  const moveDealerBtn = document.getElementById('move-dealer');
+  const nextPlayerBtn = document.getElementById('next-player');
+  const resetTableBtn = document.getElementById('reset-table');
+
+  // 랜덤 플레이어 추가
+  if (addPlayerBtn) {
+    addPlayerBtn.addEventListener('click', () => {
+      const names = ['Alex', 'Sam', 'Jordan', 'Casey', 'Riley', 'Taylor'];
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      const randomStack = Math.floor(Math.random() * 1000) + 500;
+
+      // 빈 좌석 찾기
+      let emptySeat = -1;
+      for (let i = 0; i < 6; i++) {
+        if (!activeTable.players.has(i)) {
+          emptySeat = i;
+          break;
+        }
+      }
+
+      if (emptySeat !== -1) {
+        activeTable.addPlayer(emptySeat, {
+          name: randomName,
+          stack: randomStack,
+          status: 'ACTIVE',
+        });
+        Toast.success(`${randomName}이 좌석 ${emptySeat + 1}에 앉았습니다`);
+      } else {
+        Toast.warning('모든 좌석이 찼습니다');
+      }
+    });
+  }
+
+  // 딜러 이동
+  if (moveDealerBtn) {
+    moveDealerBtn.addEventListener('click', () => {
+      let newDealer = (activeTable.dealerSeat + 1) % 6;
+      // 플레이어가 있는 좌석으로 이동
+      while (!activeTable.players.has(newDealer) && newDealer !== activeTable.dealerSeat) {
+        newDealer = (newDealer + 1) % 6;
+      }
+
+      if (activeTable.players.has(newDealer)) {
+        activeTable.moveDealerButton(newDealer);
+        Toast.info(`딜러 버튼이 좌석 ${newDealer + 1}로 이동했습니다`);
+      }
+    });
+  }
+
+  // 다음 플레이어
+  if (nextPlayerBtn) {
+    nextPlayerBtn.addEventListener('click', () => {
+      const currentActive = activeTable.activeSeat;
+      let nextActive = currentActive !== null ? (currentActive + 1) % 6 : 0;
+
+      // 액티브 플레이어가 있는 좌석 찾기
+      let attempts = 0;
+      while (!activeTable.players.has(nextActive) && attempts < 6) {
+        nextActive = (nextActive + 1) % 6;
+        attempts++;
+      }
+
+      if (activeTable.players.has(nextActive) && attempts < 6) {
+        activeTable.setActivePlayer(nextActive);
+        Toast.info(`플레이어 ${activeTable.players.get(nextActive).name}의 차례입니다`);
+      }
+    });
+  }
+
+  // 테이블 리셋
+  if (resetTableBtn) {
+    resetTableBtn.addEventListener('click', () => {
+      activeTable.reset();
+      Toast.info('테이블이 초기화되었습니다');
+    });
+  }
+
+  // 좌석 클릭 이벤트
+  activeTable.element.addEventListener('seatclick', (e) => {
+    const { seat, player } = e.detail;
+    if (player) {
+      Toast.info(`좌석 ${seat + 1}: ${player.name} (스택: $${player.stack})`);
+    } else {
+      Toast.info(`좌석 ${seat + 1}: 빈 좌석`);
+    }
+  });
+}
+
+/**
  * 포커 UI 데모
  */
 function renderPokerDemo() {
@@ -546,16 +710,6 @@ function renderPokerDemo() {
   if (!container) {
     return;
   }
-
-  // 포커 테이블
-  const tableDemo = document.createElement('div');
-  tableDemo.className = 'poker-table-demo';
-
-  const table = document.createElement('div');
-  table.className = 'poker-table';
-  tableDemo.appendChild(table);
-
-  container.appendChild(tableDemo);
 
   // 포커 카드
   const cardsDemo = document.createElement('div');

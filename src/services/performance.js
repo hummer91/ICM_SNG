@@ -2,7 +2,7 @@
  * Core Web Vitals 및 성능 모니터링
  */
 
-import { getCLS, getFID, getLCP, getFCP, getTTFB } from 'web-vitals';
+// web-vitals는 CDN을 통해 전역으로 로드됨
 import { reportError, addBreadcrumb } from './sentry.js';
 import { trackEvent } from './analytics.js';
 import { debug, PERF_LCP_BUDGET, PERF_FID_BUDGET, PERF_CLS_BUDGET } from '../config/environment.js';
@@ -33,12 +33,16 @@ export function initPerformanceMonitoring() {
     console.info('Initializing performance monitoring...');
   }
 
-  // Core Web Vitals 측정
-  getCLS(onCLS);
-  getFID(onFID);
-  getLCP(onLCP);
-  getFCP(onFCP);
-  getTTFB(onTTFB);
+  // Core Web Vitals 측정 (webVitals는 전역으로 로드됨)
+  if (typeof window.webVitals !== 'undefined') {
+    window.webVitals.getCLS(onCLS);
+    window.webVitals.getFID(onFID);
+    window.webVitals.getLCP(onLCP);
+    window.webVitals.getFCP(onFCP);
+    window.webVitals.getTTFB(onTTFB);
+  } else {
+    console.warn('web-vitals not loaded');
+  }
 
   // 페이지 로드 성능 측정
   measurePageLoadPerformance();

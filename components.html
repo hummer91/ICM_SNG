@@ -40,6 +40,7 @@
                     <a href="#modals">모달</a>
                     <a href="#toasts">토스트</a>
                     <a href="#rangechart">레인지 차트</a>
+                    <a href="#pokertable">포커 테이블</a>
                     <a href="#poker">포커 UI</a>
                 </nav>
             </div>
@@ -97,6 +98,34 @@
                         프리플랍 핸드 레인지를 13x13 그리드로 표시합니다. EV 값에 따라 색상이 변경됩니다.
                     </p>
                     <div class="rangechart-demo"></div>
+                </section>
+
+                <!-- 포커 테이블 -->
+                <section id="pokertable" class="demo-section">
+                    <h2>포커 테이블</h2>
+                    <p class="section-description">6인 SNG 포커 테이블 인터페이스</p>
+                    
+                    <div class="demo-group">
+                        <h3>기본 테이블</h3>
+                        <div class="pokertable-demo-basic"></div>
+                    </div>
+
+                    <div class="demo-group">
+                        <h3>플레이어가 있는 테이블</h3>
+                        <div class="pokertable-demo-players"></div>
+                    </div>
+
+                    <div class="demo-group">
+                        <h3>게임 진행 중 테이블</h3>
+                        <div class="pokertable-demo-active"></div>
+                    </div>
+
+                    <div class="demo-controls">
+                        <button id="add-random-player" class="btn btn-primary">랜덤 플레이어 추가</button>
+                        <button id="move-dealer" class="btn btn-secondary">딜러 이동</button>
+                        <button id="next-player" class="btn btn-secondary">다음 플레이어</button>
+                        <button id="reset-table" class="btn btn-outline">테이블 리셋</button>
+                    </div>
                 </section>
 
                 <!-- 포커 전용 UI -->

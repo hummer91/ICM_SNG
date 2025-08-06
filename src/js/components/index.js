@@ -12,6 +12,7 @@ import { Modal } from './Modal.js';
 import { Toast } from './Toast.js';
 import { Theme } from './Theme.js';
 import { RangeChart } from './RangeChart.js';
+import { PokerTable } from './PokerTable.js';
 
 // 전역 컴포넌트 레지스트리
 const Components = {
@@ -22,6 +23,7 @@ const Components = {
   Toast,
   Theme,
   RangeChart,
+  PokerTable,
 };
 
 // 컴포넌트를 전역으로 사용할 수 있도록 window 객체에 추가
@@ -29,11 +31,11 @@ window.ICMComponents = Components;
 
 // 컴포넌트 초기화
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('Linear 디자인 시스템 컴포넌트 로드 완료');
+  // console.log('Linear 디자인 시스템 컴포넌트 로드 완료');
 
   // 테마 초기화
   Theme.init();
 });
 
 // 컴포넌트 내보내기
-export { Button, Input, Card, Modal, Toast, Theme, RangeChart };
+export { Button, Input, Card, Modal, Toast, Theme, RangeChart, PokerTable };

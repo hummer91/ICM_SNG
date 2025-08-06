@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Names Test</title>
+    <link rel="stylesheet" href="src/css/main.css">
+    <style>
+        body {
+            padding: 50px;
+            background: var(--bg-primary);
+        }
+        .test-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .test-card {
+            width: 180px;
+            height: 110px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: white; margin-bottom: 30px;">Player Names Visibility Test</h1>
+    
+    <div class="test-container">
+        <!-- 테스트 1: 기본 플레이어 카드 -->
+        <div class="card player-card test-card">
+            <span class="player-name">Player 1</span>
+            <span class="player-position">BTN</span>
+            <div class="player-info">
+                <div class="player-chips">
+                    <div class="chip-stack">
+                        <span class="chip-count">1,500</span>
+                        <span class="chip-bb">30.0 BB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 테스트 2: 다른 색상 -->
+        <div class="card player-card test-card">
+            <span class="player-name" style="color: #ff0000;">Player 2 (Red)</span>
+            <span class="player-position">SB</span>
+            <div class="player-info">
+                <div class="player-chips">
+                    <div class="chip-stack">
+                        <span class="chip-count">1,200</span>
+                        <span class="chip-bb">24.0 BB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 테스트 3: 더 큰 폰트 -->
+        <div class="card player-card test-card">
+            <span class="player-name" style="font-size: 18px;">Player 3 (Bigger)</span>
+            <div class="player-info">
+                <div class="player-header">
+                    <span class="player-position">BB</span>
+                </div>
+                <div class="player-chips">
+                    <div class="chip-icon">$</div>
+                    <div class="chip-stack">
+                        <span class="chip-count">800</span>
+                        <span class="chip-bb">16.0 BB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 테스트 4: 흰색 텍스트 -->
+        <div class="card player-card test-card">
+            <span class="player-name" style="color: white; background: #5e6ad2;">Player 4 (White)</span>
+            <div class="player-info">
+                <div class="player-header">
+                    <span class="player-position">UTG</span>
+                </div>
+                <div class="player-chips">
+                    <div class="chip-icon">$</div>
+                    <div class="chip-stack">
+                        <span class="chip-count">2,000</span>
+                        <span class="chip-bb">40.0 BB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px; color: white;">
+        <h2>업데이트된 변경사항:</h2>
+        <ul style="line-height: 1.8;">
+            <li>✅ 달러 아이콘 제거됨</li>
+            <li>✅ 포지션 배지가 우측 상단으로 이동</li>
+            <li>✅ 플레이어 이름이 보라색 테두리와 함께 표시</li>
+        </ul>
+        <pre style="background: #222; padding: 20px; border-radius: 8px;">
+.player-name {
+  position: absolute;
+  top: -30px;
+  left: 8px;
+  color: #5e6ad2;
+  border: 2px solid #5e6ad2;
+}
+
+.player-position {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+        </pre>
+    </div>
+</body>
+</html>

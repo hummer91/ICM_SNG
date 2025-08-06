@@ -2,8 +2,7 @@
  * Sentry 에러 추적 서비스
  */
 
-import * as Sentry from '@sentry/browser';
-import { BrowserTracing } from '@sentry/integrations';
+// Sentry는 CDN을 통해 전역으로 로드됨
 import {
   SENTRY_DSN,
   SENTRY_ENVIRONMENT,
@@ -17,24 +16,22 @@ import {
  * Sentry 초기화
  */
 export function initSentry() {
-  if (!enableErrorTracking || !SENTRY_DSN) {
+  if (!enableErrorTracking || !SENTRY_DSN || typeof window.Sentry === 'undefined') {
     if (debug) {
-      console.info('Sentry is disabled or DSN not provided');
+      console.info('Sentry is disabled, DSN not provided, or Sentry not loaded');
     }
     return;
   }
 
   try {
-    Sentry.init({
+    window.Sentry.init({
       dsn: SENTRY_DSN,
       environment: SENTRY_ENVIRONMENT,
       release: SENTRY_RELEASE,
       integrations: [
-        new BrowserTracing({
+        new window.Sentry.BrowserTracing({
           // 성능 모니터링 설정
           tracingOrigins: ['localhost', /^\//, /^https:\/\/.*\.icm-sng\.com/],
-          // 라우트 변경 추적
-          routingInstrumentation: Sentry.browserTracingIntegration(),
         }),
       ],
       // 성능 모니터링 샘플링 비율
@@ -75,7 +72,7 @@ export function initSentry() {
 
     // 사용자 컨텍스트 설정 (익명화된 ID 사용)
     const userId = getAnonymousUserId();
-    Sentry.setUser({ id: userId });
+    window.Sentry.setUser({ id: userId });
 
     console.info(`Sentry initialized for ${APP_NAME} in ${SENTRY_ENVIRONMENT} mode`);
   } catch (error) {
@@ -102,11 +99,11 @@ function getAnonymousUserId() {
  * 커스텀 에러 리포팅
  */
 export function reportError(error, context = {}) {
-  if (!enableErrorTracking) {
+  if (!enableErrorTracking || typeof window.Sentry === 'undefined') {
     return;
   }
 
-  Sentry.captureException(error, {
+  window.Sentry.captureException(error, {
     tags: {
       component: context.component || 'unknown',
       action: context.action || 'unknown',
@@ -119,11 +116,11 @@ export function reportError(error, context = {}) {
  * 커스텀 메시지 리포팅
  */
 export function reportMessage(message, level = 'info', context = {}) {
-  if (!enableErrorTracking) {
+  if (!enableErrorTracking || typeof window.Sentry === 'undefined') {
     return;
   }
 
-  Sentry.captureMessage(message, level, {
+  window.Sentry.captureMessage(message, level, {
     tags: context.tags || {},
     extra: context.extra || {},
   });
@@ -133,11 +130,11 @@ export function reportMessage(message, level = 'info', context = {}) {
  * 성능 트랜잭션 시작
  */
 export function startTransaction(name, op = 'custom') {
-  if (!enableErrorTracking) {
+  if (!enableErrorTracking || typeof window.Sentry === 'undefined') {
     return null;
   }
 
-  return Sentry.startTransaction({
+  return window.Sentry.startTransaction({
     name,
     op,
   });
@@ -147,11 +144,11 @@ export function startTransaction(name, op = 'custom') {
  * 브레드크럼 추가
  */
 export function addBreadcrumb(breadcrumb) {
-  if (!enableErrorTracking) {
+  if (!enableErrorTracking || typeof window.Sentry === 'undefined') {
     return;
   }
 
-  Sentry.addBreadcrumb({
+  window.Sentry.addBreadcrumb({
     timestamp: Date.now() / 1000,
     ...breadcrumb,
   });
