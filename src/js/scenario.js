@@ -4,6 +4,7 @@
  */
 
 import config from '../config/environment.js';
+import { updateICMPanel } from './ui/views/gameLayout.js';
 
 // 현재 시나리오 상태
 let currentScenarioIndex = 0;
@@ -196,6 +197,9 @@ export function applyScenarioToTable(scenario) {
 
     // 시나리오 정보 패널 업데이트
     updateScenarioInfoPanel(scenario);
+
+    // ICM 패널 업데이트
+    updateICMPanel(scenario);
 
     if (config.debug) {
       console.info(`Applied scenario to table: ${scenario.title}`);
@@ -509,13 +513,13 @@ function displayPlayerCards(heroCards) {
       // heroCards가 "A5s" 형태의 문자열인 경우 파싱
       let cardDisplay = '';
       if (typeof heroCards === 'string') {
-        cardDisplay = `<div class=\"hole-cards\"><div class=\"card\">${heroCards}</div></div>`;
+        cardDisplay = `<div class="hole-cards"><div class="card">${heroCards}</div></div>`;
       } else {
         // 기존 객체 형태 지원
         cardDisplay = `
-          <div class=\"hole-cards\">
-            <div class=\"card\">${heroCards.card1.rank}${getSuitSymbol(heroCards.card1.suit)}</div>
-            <div class=\"card\">${heroCards.card2.rank}${getSuitSymbol(heroCards.card2.suit)}</div>
+          <div class="hole-cards">
+            <div class="card">${heroCards.card1.rank}${getSuitSymbol(heroCards.card1.suit)}</div>
+            <div class="card">${heroCards.card2.rank}${getSuitSymbol(heroCards.card2.suit)}</div>
           </div>
         `;
       }

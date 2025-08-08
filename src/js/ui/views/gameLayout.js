@@ -240,11 +240,11 @@ function initializeControlPanel() {
       <div class="icm-values">
         <div class="icm-item">
           <span class="icm-label">Your Equity:</span>
-          <span class="icm-value">16.67%</span>
+          <span class="icm-value" id="hero-equity">16.67%</span>
         </div>
         <div class="icm-item">
           <span class="icm-label">Prize Pool:</span>
-          <span class="icm-value">$600</span>
+          <span class="icm-value" id="prize-pool">$600</span>
         </div>
       </div>
       <div class="payouts">
@@ -252,15 +252,11 @@ function initializeControlPanel() {
         <div class="payout-list">
           <div class="payout-item">
             <span class="place">1st:</span>
-            <span class="amount">$300 (50%)</span>
+            <span class="amount">$390 (65%)</span>
           </div>
           <div class="payout-item">
             <span class="place">2nd:</span>
-            <span class="amount">$180 (30%)</span>
-          </div>
-          <div class="payout-item">
-            <span class="place">3rd:</span>
-            <span class="amount">$120 (20%)</span>
+            <span class="amount">$210 (35%)</span>
           </div>
         </div>
       </div>
@@ -1296,6 +1292,29 @@ window.testICMDisplay = function () {
   displayICMAnalysis(mockData, true, 'push');
 };
 
+/**
+ * ICM 정보 패널 업데이트
+ * @param {Object} scenario - 현재 시나리오
+ */
+export function updateICMPanel(scenario) {
+  if (!scenario || !scenario.icmAnalysis || !scenario.icmAnalysis.equity) {
+    return;
+  }
+
+  const heroEquityElement = document.getElementById('hero-equity');
+  const prizePoolElement = document.getElementById('prize-pool');
+
+  if (heroEquityElement && scenario.icmAnalysis.equity.HERO) {
+    const heroEquity = scenario.icmAnalysis.equity.HERO;
+    heroEquityElement.textContent = `${heroEquity.toFixed(1)}%`;
+  }
+
+  if (prizePoolElement) {
+    // 6인 토너먼트 * 300칩 = 1800칩 총상금 (가정)
+    prizePoolElement.textContent = '$1800';
+  }
+}
+
 export default {
   initializeGameLayout,
   updateDealerButton,
@@ -1304,4 +1323,5 @@ export default {
   updateBigBlind,
   getCurrentBigBlind,
   setAllPlayerChips,
+  updateICMPanel,
 };
