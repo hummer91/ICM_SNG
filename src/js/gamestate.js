@@ -943,7 +943,7 @@ export class GameStateManager {
    */
   calculateFinalPayouts() {
     const totalPrizePool = this.config.maxPlayers * this.config.startingStack;
-    const payoutStructure = [0.5, 0.3, 0.2]; // 1위 50%, 2위 30%, 3위 20%
+    const payoutStructure = [0.65, 0.35]; // 1위 65%, 2위 35%
 
     const standings = [...this.gameStats.eliminationOrder].reverse();
     standings.forEach((standing, index) => {

@@ -7,7 +7,7 @@
  * 토너먼트 상금 분배 구조
  * @constant {number[]}
  */
-export const PRIZE_STRUCTURE = [0.5, 0.3, 0.2]; // 1st: 50%, 2nd: 30%, 3rd: 20%
+export const PRIZE_STRUCTURE = [0.65, 0.35]; // 1st: 65%, 2nd: 35%
 
 /**
  * 포지션 정의
@@ -59,19 +59,21 @@ export const GAME_STATES = {
  * @constant {Object}
  */
 export const DEFAULT_SETTINGS = {
-  STARTING_CHIPS: 1500,
-  STARTING_BLINDS: { small: 25, big: 50 },
+  STARTING_CHIPS: 300,
+  STARTING_BLINDS: { small: 10, big: 20 },
   BLIND_LEVELS: [
-    { small: 25, big: 50, ante: 0, duration: 10 },
+    { small: 10, big: 20, ante: 0, duration: 10 },
+    { small: 15, big: 30, ante: 0, duration: 10 },
+    { small: 20, big: 40, ante: 0, duration: 10 },
+    { small: 30, big: 60, ante: 0, duration: 10 },
+    { small: 40, big: 80, ante: 0, duration: 10 },
     { small: 50, big: 100, ante: 0, duration: 10 },
+    { small: 60, big: 120, ante: 0, duration: 10 },
     { small: 75, big: 150, ante: 0, duration: 10 },
-    { small: 100, big: 200, ante: 25, duration: 10 },
-    { small: 150, big: 300, ante: 25, duration: 10 },
-    { small: 200, big: 400, ante: 50, duration: 10 },
-    { small: 300, big: 600, ante: 75, duration: 10 },
-    { small: 400, big: 800, ante: 100, duration: 10 },
-    { small: 600, big: 1200, ante: 150, duration: 10 },
-    { small: 800, big: 1600, ante: 200, duration: 10 },
+    { small: 90, big: 180, ante: 0, duration: 10 },
+    { small: 100, big: 200, ante: 0, duration: 10 },
+    { small: 125, big: 250, ante: 0, duration: 10 },
+    { small: 150, big: 300, ante: 0, duration: 10 },
   ],
 };
 

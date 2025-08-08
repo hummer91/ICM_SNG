@@ -10,9 +10,9 @@
 
 /**
  * 기본 상금 구조 (6인 SNG)
- * 1위: 50%, 2위: 30%, 3위: 20%
+ * 1위: 65%, 2위: 35%
  */
-const DEFAULT_PRIZE_STRUCTURE = [0.5, 0.3, 0.2];
+const DEFAULT_PRIZE_STRUCTURE = [0.65, 0.35];
 
 /**
  * ICM 계산 결과를 위한 클래스

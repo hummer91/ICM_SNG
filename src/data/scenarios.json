@@ -1,25 +1,383 @@
 {
-  "version": "1.0",
-  "description": "SNG ICM Push/Fold 학습 시나리오 - 짧은 스택 상황 중심",
+  "version": "2.0",
+  "description": "SNG ICM Push/Fold 학습 시나리오 - 6인 토너먼트, 300칩 시작, 상금 구조 65%/35%",
   "scenarios": [
     {
       "id": "scenario_001",
-      "title": "버블 상황 - 9BB BTN 스틸",
-      "description": "4명 남은 버블 상황에서 BTN 포지션 스틸 결정",
+      "title": "초기 스테이지 - UTG 푸시 (6명)",
+      "description": "토너먼트 초반, 6명 모두 남아있는 상황에서 UTG 포지션 결정",
       "difficulty": "beginner",
-      "tags": ["bubble", "steal", "BTN", "4-handed"],
+      "tags": ["early-stage", "6-handed", "UTG", "15bb"],
+      "situation": {
+        "playersLeft": 6,
+        "payoutPositions": 2,
+        "payoutStructure": [0.65, 0.35],
+        "blindLevel": {
+          "small": 10,
+          "big": 20,
+          "ante": 0
+        },
+        "heroPosition": "UTG",
+        "heroCards": "A9o",
+        "pot": 0,
+        "playerBets": {
+          "HERO": 0,
+          "MP": 0,
+          "CO": 0,
+          "BTN": 0,
+          "SB": 10,
+          "BB": 20
+        },
+        "remainingStacks": {
+          "HERO": 300,
+          "MP": 300,
+          "CO": 300,
+          "BTN": 300,
+          "SB": 290,
+          "BB": 280
+        },
+        "totalPotForCalculation": 30,
+        "positions": ["HERO(UTG)", "MP", "CO", "BTN", "SB", "BB"],
+        "actions": [],
+        "actionToHero": "Action to HERO",
+        "dealerPosition": "BTN"
+      },
+      "correctAnswer": "fold",
+      "explanation": {
+        "short": "15BB UTG에서 A9o는 너무 약합니다.",
+        "detailed": "토너먼트 초반 6명이 모두 남아있는 상황에서 UTG는 매우 타이트하게 플레이해야 합니다. A9o는 5명의 플레이어가 뒤에 남아있는 상황에서는 충분히 강하지 않습니다. 더 강한 핸드를 기다리는 것이 유리합니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 0.0,
+        "foldEV": 0.0,
+        "difference": 0.0,
+        "equity": {
+          "HERO": 16.67,
+          "MP": 16.67,
+          "CO": 16.67,
+          "BTN": 16.67,
+          "SB": 16.67,
+          "BB": 16.67
+        }
+      },
+      "handRange": {
+        "pushRange": "99+, AJs+, AQo+",
+        "foldRange": "A9o 포함 대부분 핸드"
+      }
+    },
+    {
+      "id": "scenario_002",
+      "title": "중반 스테이지 - BTN 스틸 (5명)",
+      "description": "5명 남은 상황에서 BTN 포지션 스틸 결정",
+      "difficulty": "beginner",
+      "tags": ["mid-stage", "5-handed", "BTN", "steal", "12bb"],
+      "situation": {
+        "playersLeft": 5,
+        "payoutPositions": 2,
+        "payoutStructure": [0.65, 0.35],
+        "blindLevel": {
+          "small": 15,
+          "big": 30,
+          "ante": 0
+        },
+        "heroPosition": "BTN",
+        "heroCards": "K8s",
+        "pot": 0,
+        "playerBets": {
+          "UTG": 0,
+          "MP": 0,
+          "HERO": 0,
+          "SB": 15,
+          "BB": 30
+        },
+        "remainingStacks": {
+          "UTG": 450,
+          "MP": 320,
+          "HERO": 375,
+          "SB": 435,
+          "BB": 220
+        },
+        "totalPotForCalculation": 45,
+        "positions": ["UTG", "MP", "HERO(BTN)", "SB", "BB"],
+        "actions": [
+          { "position": "UTG", "action": "fold" },
+          { "position": "MP", "action": "fold" }
+        ],
+        "actionToHero": "UTG folds, MP folds",
+        "dealerPosition": "HERO"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "12.5BB BTN에서 K8s는 스틸 범위에 포함됩니다.",
+        "detailed": "5명이 남은 상황에서 앞자리가 모두 폴드했고, BTN 포지션에서 12.5BB 스택으로 K8s는 충분히 스틸할 만한 핸드입니다. SB와 BB만 넘어가면 되므로 푸시 범위가 넓어집니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 0.0,
+        "foldEV": 0.0,
+        "difference": 0.0,
+        "equity": {
+          "UTG": 25.0,
+          "MP": 17.8,
+          "HERO": 20.8,
+          "SB": 24.2,
+          "BB": 12.2
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2s+, A5o+, K2s+, K7o+, Q4s+, Q9o+, J6s+, T7s+, 96s+, 86s+, 75s+",
+        "foldRange": "더 약한 오프슈트 핸드"
+      }
+    },
+    {
+      "id": "scenario_003",
+      "title": "버블 직전 - SB vs BB (4명)",
+      "description": "4명 남아 버블 직전 상황에서 SB 결정",
+      "difficulty": "intermediate",
+      "tags": ["bubble", "4-handed", "SB", "heads-up-pot", "8bb"],
       "situation": {
         "playersLeft": 4,
-        "payoutPositions": 3,
-        "payoutStructure": [0.5, 0.3, 0.2],
+        "payoutPositions": 2,
+        "payoutStructure": [0.65, 0.35],
+        "blindLevel": {
+          "small": 20,
+          "big": 40,
+          "ante": 0
+        },
+        "heroPosition": "SB",
+        "heroCards": "Q3s",
+        "pot": 0,
+        "playerBets": {
+          "UTG": 0,
+          "CO": 0,
+          "HERO": 20,
+          "BB": 40
+        },
+        "remainingStacks": {
+          "UTG": 600,
+          "CO": 180,
+          "HERO": 160,
+          "BB": 460
+        },
+        "totalPotForCalculation": 60,
+        "positions": ["UTG", "CO", "HERO(SB)", "BB"],
+        "actions": [
+          { "position": "UTG", "action": "fold" },
+          { "position": "CO", "action": "fold" }
+        ],
+        "actionToHero": "UTG folds, CO folds",
+        "dealerPosition": "CO"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "8BB 버블 상황에서 Q3s는 SB 푸시 범위입니다.",
+        "detailed": "버블 직전 4명 남은 상황에서 8BB 스택으로 SB에서 Q3s는 푸시해야 합니다. BB가 큰 스택이지만 ICM 압박으로 타이트하게 콜할 것이고, 폴드 에퀴티가 높습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 0.0,
+        "foldEV": 0.0,
+        "difference": 0.0,
+        "equity": {
+          "UTG": 50.0,
+          "CO": 15.0,
+          "HERO": 13.3,
+          "BB": 38.3
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2+, K2s+, K4o+, Q2s+, Q7o+, J4s+, J8o+, T6s+, T9o, 95s+, 85s+, 75s+, 65s",
+        "foldRange": "매우 약한 핸드만"
+      }
+    },
+    {
+      "id": "scenario_004",
+      "title": "버블 상황 - BB 디펜스 (4명)",
+      "description": "버블에서 BB 포지션 올인 콜 결정",
+      "difficulty": "intermediate", 
+      "tags": ["bubble", "BB-defense", "4-handed", "all-in-call", "6bb"],
+      "situation": {
+        "playersLeft": 4,
+        "payoutPositions": 2,
+        "payoutStructure": [0.65, 0.35],
+        "blindLevel": {
+          "small": 25,
+          "big": 50,
+          "ante": 0
+        },
+        "heroPosition": "BB",
+        "heroCards": "A5o",
+        "pot": 0,
+        "playerBets": {
+          "UTG": 0,
+          "CO": 0,
+          "SB": 300,
+          "HERO": 50
+        },
+        "remainingStacks": {
+          "UTG": 750,
+          "CO": 200,
+          "SB": 0,
+          "HERO": 250
+        },
+        "totalPotForCalculation": 375,
+        "positions": ["UTG", "CO", "SB", "HERO(BB)"],
+        "actions": [
+          { "position": "UTG", "action": "fold" },
+          { "position": "CO", "action": "fold" },
+          { "position": "SB", "action": "push" }
+        ],
+        "actionToHero": "UTG folds, CO folds, SB pushes all-in",
+        "dealerPosition": "CO"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "6BB에서 A5o는 SB 푸시에 대해 콜해야 합니다.",
+        "detailed": "버블 상황에서 6BB 스택으로 SB의 푸시에 대해 A5o는 충분히 콜할 만합니다. 팟 오즈도 좋고, SB의 푸시 범위가 매우 넓어 A5o가 앞서는 경우가 많습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 0.0,
+        "foldEV": 0.0,
+        "difference": 0.0,
+        "equity": {
+          "UTG": 62.5,
+          "CO": 16.7,
+          "SB": 25.0,
+          "HERO": 20.8
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2+, K2s+, K6o+, Q2s+, Q8o+, J5s+, J9o+, T7s+, 96s+, 86s+, 75s+, 65s",
+        "foldRange": "매우 약한 핸드만"
+      }
+    },
+    {
+      "id": "scenario_005",
+      "title": "인더머니 - 헤즈업 상황 (2명)",
+      "description": "최종 헤즈업에서 SB 올인 결정",
+      "difficulty": "advanced",
+      "tags": ["heads-up", "final", "2-handed", "SB", "10bb"],
+      "situation": {
+        "playersLeft": 2,
+        "payoutPositions": 2,
+        "payoutStructure": [0.65, 0.35],
+        "blindLevel": {
+          "small": 30,
+          "big": 60,
+          "ante": 0
+        },
+        "heroPosition": "SB",
+        "heroCards": "J6o",
+        "pot": 0,
+        "playerBets": {
+          "HERO": 30,
+          "BB": 60
+        },
+        "remainingStacks": {
+          "HERO": 270,
+          "BB": 330
+        },
+        "totalPotForCalculation": 90,
+        "positions": ["HERO(SB)", "BB"],
+        "actions": [],
+        "actionToHero": "Action to HERO",
+        "dealerPosition": "HERO"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "헤즈업 10BB에서 J6o는 푸시 핸드입니다.",
+        "detailed": "헤즈업 상황에서 10BB 스택으로 J6o는 충분히 푸시할 만한 핸드입니다. 헤즈업에서는 핸드 범위가 매우 넓어지므로 J6o도 충분히 가치가 있습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 0.0,
+        "foldEV": 0.0,
+        "difference": 0.0,
+        "equity": {
+          "HERO": 45.0,
+          "BB": 55.0
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2+, K2+, Q2+, J2s+, J5o+, T4s+, T7o+, 94s+, 96o+, 84s+, 86o+, 74s+, 64s+, 54s",
+        "foldRange": "매우 약한 핸드만"
+      }
+    },
+    {
+      "id": "scenario_006",
+      "title": "극짧은 스택 - UTG 생존 푸시 (5명)",
+      "description": "5BB 극짧은 스택으로 UTG에서 생존을 위한 결정",
+      "difficulty": "beginner",
+      "tags": ["super-short", "5-handed", "UTG", "survival", "5bb"],
+      "situation": {
+        "playersLeft": 5,
+        "payoutPositions": 2,
+        "payoutStructure": [0.65, 0.35],
+        "blindLevel": {
+          "small": 40,
+          "big": 80,
+          "ante": 0
+        },
+        "heroPosition": "UTG",
+        "heroCards": "K7o",
+        "pot": 0,
+        "playerBets": {
+          "HERO": 0,
+          "MP": 0,
+          "BTN": 0,
+          "SB": 40,
+          "BB": 80
+        },
+        "remainingStacks": {
+          "HERO": 400,
+          "MP": 480,
+          "BTN": 520,
+          "SB": 360,
+          "BB": 240
+        },
+        "totalPotForCalculation": 120,
+        "positions": ["HERO(UTG)", "MP", "BTN", "SB", "BB"],
+        "actions": [],
+        "actionToHero": "Action to HERO",
+        "dealerPosition": "BTN"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "5BB에서 K7o는 생존을 위한 푸시 핸드입니다.",
+        "detailed": "5BB 스택에서는 프리미엄 핸드를 기다릴 여유가 없습니다. K7o는 5BB 스택에서 UTG라도 충분히 푸시할 만한 핸드입니다. 블라인드를 기다리면 더욱 불리해집니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 0.0,
+        "foldEV": 0.0,
+        "difference": 0.0,
+        "equity": {
+          "HERO": 20.0,
+          "MP": 24.0,
+          "BTN": 26.0,
+          "SB": 18.0,
+          "BB": 12.0
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2+, K2s+, K5o+, Q4s+, Q8o+, J6s+, J9o+, T7s+, 96s+, 86s+, 75s+",
+        "foldRange": "매우 약한 핸드만"
+      }
+    },
+    {
+      "id": "scenario_007",
+      "title": "중간 스테이지 - CO 레이트 스테이지 (4명)",
+      "description": "4명 남은 상황에서 CO 포지션 푸시 결정",
+      "difficulty": "intermediate",
+      "tags": ["4-handed", "CO", "late-stage", "9bb"],
+      "situation": {
+        "playersLeft": 4,
+        "payoutPositions": 2,
+        "payoutStructure": [0.65, 0.35],
         "blindLevel": {
           "small": 50,
           "big": 100,
-          "ante": 10
+          "ante": 0
         },
-        "heroPosition": "BTN",
-        "heroCards": "A7o",
-        "pot": 40,
+        "heroPosition": "CO",
+        "heroCards": "A4s",
+        "pot": 0,
         "playerBets": {
           "UTG": 0,
           "HERO": 0,
@@ -27,13 +385,13 @@
           "BB": 100
         },
         "remainingStacks": {
-          "UTG": 1790,
-          "HERO": 930,
-          "SB": 540,
-          "BB": 2090
+          "UTG": 300,
+          "HERO": 900,
+          "SB": 400,
+          "BB": 200
         },
-        "totalPotForCalculation": 190,
-        "positions": ["UTG", "HERO(BTN)", "SB", "BB"],
+        "totalPotForCalculation": 150,
+        "positions": ["UTG", "HERO(CO)", "SB", "BB"],
         "actions": [
           { "position": "UTG", "action": "fold" }
         ],
@@ -42,364 +400,117 @@
       },
       "correctAnswer": "push",
       "explanation": {
-        "short": "9.4BB에서 A7o는 BTN 푸시 핸드입니다.",
-        "detailed": "버블 상황에서 SB가 매우 타이트하게 콜할 것이고, BB는 큰 스택이지만 ICM 압박이 있습니다. A7o는 9BB 스택에서 BTN 푸시 범위에 포함되며, 폴드 에퀴티가 높아 +EV 플레이입니다."
+        "short": "9BB CO에서 A4s는 푸시 범위에 포함됩니다.",
+        "detailed": "4명 남은 상황에서 CO 포지션에서 A4s는 충분히 푸시할 만한 핸드입니다. UTG가 폴드했으므로 SB와 BB만 넘어가면 되고, 9BB 스택에서는 적극적인 플레이가 필요합니다."
       },
       "icmAnalysis": {
-        "pushEV": 142.8,
-        "foldEV": 138.2,
-        "difference": 4.6,
+        "pushEV": 0.0,
+        "foldEV": 0.0,
+        "difference": 0.0,
         "equity": {
-          "UTG": 28.5,
-          "HERO": 18.7,
-          "SB": 15.2,
-          "BB": 37.6
+          "UTG": 25.0,
+          "HERO": 50.0,
+          "SB": 22.2,
+          "BB": 11.1
         }
       },
       "handRange": {
-        "pushRange": "22+, A2s+, A4o+, K5s+, K8o+, Q7s+, Q9o+, J8s+, JTo, T8s+",
-        "foldRange": "기타 모든 핸드"
+        "pushRange": "22+, A2s+, A3o+, K2s+, K8o+, Q5s+, Q9o+, J7s+, JTo, T8s+, 97s+, 87s, 76s",
+        "foldRange": "약한 오프슈트 핸드"
       }
     },
     {
-      "id": "scenario_002", 
-      "title": "숏스택 SB 푸시",
-      "description": "매우 짧은 스택으로 생존을 위한 푸시 타이밍입니다.",
-      "difficulty": "beginner",
-      "tags": ["short-stack", "push-fold", "SB"],
+      "id": "scenario_008",
+      "title": "경계선 핸드 - BTN 스틸 (3명)",
+      "description": "3명 남은 상황에서 경계선 핸드의 스틸 결정",
+      "difficulty": "advanced",
+      "tags": ["3-handed", "BTN", "marginal", "steal", "11bb"],
       "situation": {
-        "playersLeft": 6,
-        "payoutPositions": 3,
-        "payoutStructure": [0.5, 0.3, 0.2],
-        "blindLevel": {
-          "small": 50,
-          "big": 100,
-          "ante": 10
-        },
-        "heroPosition": "SB",
-        "heroCards": "KQo",
-        "pot": 60,
-        "playerBets": {
-          "UTG": 0,
-          "MP": 0,
-          "CO": 0,
-          "BTN": 0,
-          "HERO": 50,
-          "BB": 100
-        },
-        "remainingStacks": {
-          "UTG": 1790,
-          "MP": 2190,
-          "CO": 1090,
-          "BTN": 990,
-          "HERO": 540,
-          "BB": 1190
-        },
-        "totalPotForCalculation": 210,
-        "positions": ["UTG", "MP", "CO", "BTN", "HERO(SB)", "BB"],
-        "actions": [
-          { "position": "UTG", "action": "fold" },
-          { "position": "MP", "action": "fold" },
-          { "position": "CO", "action": "fold" },
-          { "position": "BTN", "action": "fold" }
-        ],
-        "actionToHero": "UTG folds, MP folds, CO folds, BTN folds",
-        "dealerPosition": "BTN"
-      },
-      "correctAnswer": "push",
-      "explanation": {
-        "short": "6BB 스택에서 KQo는 확실한 푸시 핸드입니다.",
-        "detailed": "6BB 스택에서는 프리미엄 핸드를 기다릴 여유가 없습니다. KQo는 BB와 1:1 상황에서도 충분히 강한 핸드이며, 폴드 에퀴티도 고려하면 명확한 푸시 상황입니다. 안테까지 있는 상황에서 더욱 푸시가 유리합니다."
-      },
-      "icmAnalysis": {
-        "pushEV": 89.4,
-        "foldEV": 82.1,
-        "difference": 7.3,
-        "equity": {
-          "UTG": 26.8,
-          "MP": 32.1,
-          "CO": 16.4,
-          "BTN": 0,
-          "HERO": 8.9,
-          "BB": 15.8
-        }
-      },
-      "handRange": {
-        "pushRange": "88+, A2s+, A7o+, K9s+, KTo+, Q9s+, QTo+, J9s+, JTo, T9s",
-        "foldRange": "더 약한 핸드들"
-      }
-    },
-    {
-      "id": "scenario_003",
-      "title": "헤즈업 상황 - 8BB vs 16BB",
-      "description": "결승 헤즈업에서 숏스택의 생존 플레이",
-      "difficulty": "intermediate", 
-      "tags": ["heads-up", "final-table", "short-stack"],
-      "situation": {
-        "playersLeft": 2,
+        "playersLeft": 3,
         "payoutPositions": 2,
         "payoutStructure": [0.65, 0.35],
         "blindLevel": {
-          "small": 100,
-          "big": 200,
-          "ante": 25
+          "small": 60,
+          "big": 120,
+          "ante": 0
         },
-        "heroPosition": "BB",
-        "heroCards": "K4s",
-        "pot": 50,
+        "heroPosition": "BTN",
+        "heroCards": "K4o",
+        "pot": 0,
         "playerBets": {
-          "SB": 3450,
-          "HERO": 200
+          "HERO": 0,
+          "SB": 60,
+          "BB": 120
         },
         "remainingStacks": {
-          "SB": 0,
-          "HERO": 1425
+          "HERO": 1320,
+          "SB": 340,
+          "BB": 340
         },
-        "totalPotForCalculation": 3700,
-        "positions": ["SB", "HERO(BB)"],
-        "actions": [
-          { "position": "SB", "action": "push" }
-        ],
-        "actionToHero": "SB pushes all-in",
-        "dealerPosition": "SB"
-      },
-      "correctAnswer": "push",
-      "explanation": {
-        "short": "8BB 헤즈업에서 K4s는 콜 핸드입니다.",
-        "detailed": "헤즈업 상황에서 상대가 먼저 푸시했을 때, 8BB 스택으로는 K4s가 충분히 콜할만한 핸드입니다. 상대의 푸시 범위가 매우 넓고 (약 60-70%), K4s는 그 범위에 대해 약 40% 승률을 가집니다. 팟 오즈와 ICM을 고려하면 콜이 유리합니다."
-      },
-      "icmAnalysis": {
-        "pushEV": 281.2,
-        "foldEV": 273.8,
-        "difference": 7.4,
-        "equity": {
-          "HERO": 33.0,
-          "SB": 67.0
-        }
-      },
-      "handRange": {
-        "pushRange": "22+, A2+, K2s+, K5o+, Q4s+, Q7o+, J6s+, J8o+, T6s+, T8o+, 96s+, 98o, 86s+, 75s+, 65s",
-        "foldRange": "매우 약한 핸드만"
-      }
-    },
-    {
-      "id": "scenario_004",
-      "title": "3명 남은 SB vs BB",
-      "description": "인더머니 확정 후 SB에서 BB와의 헤즈업 결정",
-      "difficulty": "intermediate",
-      "tags": ["3-handed", "SB", "heads-up", "in-the-money", "BTN-fold"],
-      "situation": {
-        "playersLeft": 3,
-        "payoutPositions": 3,
-        "payoutStructure": [0.5, 0.3, 0.2],
-        "blindLevel": {
-          "small": 75,
-          "big": 150,
-          "ante": 15
-        },
-        "heroPosition": "SB",
-        "heroCards": "A8o",
-        "pot": 45,
-        "playerBets": {
-          "BTN": 0,
-          "HERO": 75,
-          "BB": 150
-        },
-        "remainingStacks": {
-          "BTN": 1185,
-          "HERO": 1610,
-          "BB": 1935
-        },
-        "totalPotForCalculation": 270,
-        "positions": ["BTN", "HERO(SB)", "BB"],
-        "actions": [
-          { "position": "BTN", "action": "fold" }
-        ],
-        "actionToHero": "BTN folds",
-        "dealerPosition": "BTN"
-      },
-      "correctAnswer": "push",
-      "explanation": {
-        "short": "11.3BB에서 SB 포지션의 A8o는 푸시 핸드입니다.",
-        "detailed": "3명이 남은 상황에서 11.3BB 스택으로 SB에서 A8o는 확실한 푸시 핸드입니다. 인더머니 상황이라 ICM 압박이 줄어들었고, SB에서는 BB 한 명만 넘어가면 되므로 푸시 범위가 넓어집니다. BTN이 폴드했으므로 SB vs BB 헤즈업 상황입니다."
-      },
-      "icmAnalysis": {
-        "pushEV": 188.4,
-        "foldEV": 182.1,
-        "difference": 6.3,
-        "equity": {
-          "HERO": 24.0,
-          "BTN": 42.0,
-          "SB": 34.0
-        }
-      },
-      "handRange": {
-        "pushRange": "22+, A2s+, A4o+, K2s+, K6o+, Q5s+, Q8o+, J7s+, J9o+, T7s+, T9o, 97s+",
-        "foldRange": "매우 약한 오프슈트 핸드만"
-      }
-    },
-    {
-      "id": "scenario_005",
-      "title": "극짧은 스택 - 5BB BB 디펜스",
-      "description": "생존이 급한 상황에서 BB 디펜스 결정",
-      "difficulty": "beginner",
-      "tags": ["super-short", "BB-defense", "survival"],
-      "situation": {
-        "playersLeft": 5,
-        "payoutPositions": 3,
-        "payoutStructure": [0.5, 0.3, 0.2],
-        "blindLevel": {
-          "small": 100,
-          "big": 200,
-          "ante": 25
-        },
-        "heroPosition": "BB",
-        "heroCards": "Q6o",
-        "pot": 125,
-        "playerBets": {
-          "UTG": 0,
-          "CO": 0,
-          "BTN": 825,
-          "SB": 100,
-          "HERO": 200
-        },
-        "remainingStacks": {
-          "UTG": 1475,
-          "CO": 2175,
-          "BTN": 0,
-          "SB": 875,
-          "HERO": 775
-        },
-        "totalPotForCalculation": 1250,
-        "positions": ["UTG", "CO", "BTN", "SB", "HERO(BB)"],
-        "actions": [
-          { "position": "UTG", "action": "fold" },
-          { "position": "CO", "action": "fold" },
-          { "position": "BTN", "action": "push" },
-          { "position": "SB", "action": "fold" }
-        ],
-        "actionToHero": "UTG folds, CO folds, BTN pushes, SB folds",
-        "dealerPosition": "UTG"
-      },
-      "correctAnswer": "push",
-      "explanation": {
-        "short": "3.9BB에서 Q6o는 팟 오즈상 콜해야 합니다.",
-        "detailed": "3.9BB 남은 스택에서 BTN의 푸시에 대해 Q6o는 충분히 콜할만합니다. 팟에 이미 1050칩이 있고 (안티 125 + SB 100 + BB 200 + BTN 올인 825), 575를 더 내면 1625 팟을 가져갈 수 있습니다. 2.8:1 팟 오즈를 받고 있으므로 Q6o가 약 26% 승률만 있어도 콜이 유리합니다."
-      },
-      "icmAnalysis": {
-        "pushEV": 145.2,
-        "foldEV": 126.8,
-        "difference": 18.4,
-        "equity": {
-          "UTG": 29.1,
-          "CO": 42.3,
-          "BTN": 0.0,
-          "SB": 15.8,
-          "HERO": 12.8
-        }
-      },
-      "handRange": {
-        "pushRange": "22+, A2+, K2+, Q2s+, Q4o+, J4s+, J7o+, T6s+, T8o+, 95s+, 97o+, 85s+, 87o, 75s+, 65s",
-        "foldRange": "매우 약한 핸드만"
-      }
-    },
-    {
-      "id": "scenario_006",
-      "title": "경계선 핸드 - SB vs BB",
-      "description": "애매한 핸드로 SB에서의 어려운 선택",
-      "difficulty": "advanced",
-      "tags": ["marginal", "SB", "heads-up-pot"],
-      "situation": {
-        "playersLeft": 4,
-        "payoutPositions": 3,
-        "payoutStructure": [0.5, 0.3, 0.2],
-        "blindLevel": {
-          "small": 75,
-          "big": 150,
-          "ante": 15
-        },
-        "heroPosition": "SB",
-        "heroCards": "K5o",
-        "pot": 60,
-        "playerBets": {
-          "UTG": 0,
-          "BTN": 0,
-          "HERO": 75,
-          "BB": 150
-        },
-        "remainingStacks": {
-          "UTG": 585,
-          "BTN": 1985,
-          "HERO": 1310,
-          "BB": 1835
-        },
-        "totalPotForCalculation": 285,
-        "positions": ["UTG", "BTN", "HERO(SB)", "BB"],
-        "actions": [
-          { "position": "UTG", "action": "fold" },
-          { "position": "BTN", "action": "fold" }
-        ],
-        "actionToHero": "UTG folds, BTN folds",
-        "dealerPosition": "BTN"
+        "totalPotForCalculation": 180,
+        "positions": ["HERO(BTN)", "SB", "BB"],
+        "actions": [],
+        "actionToHero": "Action to HERO",
+        "dealerPosition": "HERO"
       },
       "correctAnswer": "fold",
       "explanation": {
-        "short": "K5o는 9.3BB SB에서 너무 약합니다.",
-        "detailed": "버블 상황에서 9.3BB 스택으로 SB에서 K5o는 경계선 핸드입니다. BB가 큰 스택이고 ICM 압박이 적어 넓게 콜할 가능성이 높습니다. K5o는 BB의 콜링 범위에 대해 불리하며, 더 좋은 스팟을 기다리는 것이 유리합니다."
+        "short": "11BB에서 K4o는 너무 약합니다.",
+        "detailed": "3명 남은 상황에서 11BB 스택으로 BTN에서 K4o는 경계선 핸드입니다. 인더머니 상황이라 ICM 압박이 줄어들었지만, K4o는 여전히 약한 핸드이므로 더 좋은 스팟을 기다리는 것이 유리합니다."
       },
       "icmAnalysis": {
-        "pushEV": 142.1,
-        "foldEV": 145.8,
-        "difference": -3.7,
+        "pushEV": 0.0,
+        "foldEV": 0.0,
+        "difference": 0.0,
         "equity": {
-          "UTG": 12.2,
-          "CO": 40.8,
-          "HERO": 18.5,
-          "BB": 28.5
+          "HERO": 66.0,
+          "SB": 17.0,
+          "BB": 17.0
         }
       },
       "handRange": {
-        "pushRange": "66+, A2s+, A7o+, K8s+, KTo+, Q9s+, QJo, J9s+, T9s",
-        "foldRange": "K5o, K6o, K7o 등 약한 킹"
+        "pushRange": "22+, A2s+, A5o+, K2s+, K9o+, Q6s+, QTo+, J8s+, JTo, T9s",
+        "foldRange": "K4o, K5o, K6o, K7o, K8o 등 약한 킹"
       }
     }
   ],
   "metadata": {
-    "totalScenarios": 6,
+    "totalScenarios": 8,
     "difficultyLevels": {
-      "beginner": 2,
-      "intermediate": 2,
+      "beginner": 3,
+      "intermediate": 3,
       "advanced": 2
     },
     "playerCounts": {
       "2-handed": 1,
       "3-handed": 1,
-      "4-handed": 2,
-      "5-handed": 2
+      "4-handed": 3,
+      "5-handed": 2,
+      "6-handed": 1
     },
     "stackSizes": {
-      "5-10BB": 4,
-      "10-15BB": 1,
-      "15-20BB": 1
+      "5-8BB": 3,
+      "8-12BB": 3,
+      "12-15BB": 2
     },
     "tags": {
+      "early-stage": 1,
+      "mid-stage": 1,
+      "late-stage": 1,
       "bubble": 2,
       "heads-up": 1,
-      "short-stack": 2,
       "super-short": 1,
       "marginal": 1,
-      "steal": 1,
+      "steal": 2,
       "BB-defense": 1,
-      "in-the-money": 1,
       "survival": 1,
-      "4-handed": 2,
-      "3-handed": 1,
-      "UTG": 1,
-      "BTN": 2,
+      "UTG": 2,
+      "BTN": 3,
       "SB": 2,
-      "BB": 2
+      "BB": 1,
+      "CO": 1
     },
-    "lastUpdated": "2024-08-08",
-    "author": "ICM SNG Learning App - Push/Fold Focus"
+    "lastUpdated": "2025-01-14",
+    "author": "ICM SNG Learning App - 새로운 토너먼트 구조 (300칩, 65%/35%)"
   }
 }

@@ -140,6 +140,20 @@ export const VALIDATION_CONFIG = {
     min: 1,
     max: 20,
     maxDuration: 30, // 최대 30분
+    validLevels: [
+      { small: 10, big: 20, ante: 0 },
+      { small: 15, big: 30, ante: 0 },
+      { small: 20, big: 40, ante: 0 },
+      { small: 30, big: 60, ante: 0 },
+      { small: 40, big: 80, ante: 0 },
+      { small: 50, big: 100, ante: 0 },
+      { small: 60, big: 120, ante: 0 },
+      { small: 75, big: 150, ante: 0 },
+      { small: 90, big: 180, ante: 0 },
+      { small: 100, big: 200, ante: 0 },
+      { small: 125, big: 250, ante: 0 },
+      { small: 150, big: 300, ante: 0 },
+    ],
   },
   icmTolerance: {
     probabilitySum: 0.0001, // 확률 합계 허용 오차
@@ -485,21 +499,7 @@ export class InputValidator {
       );
     }
 
-    const { level, small, big, ante = 0, duration } = blindLevel;
-
-    // 레벨 검증
-    if (
-      !Number.isInteger(level) ||
-      level < this.config.blindLevel.min ||
-      level > this.config.blindLevel.max
-    ) {
-      return result.addError(
-        `유효하지 않은 블라인드 레벨입니다: ${level}`,
-        ERROR_CODES.BLIND_LEVEL_INVALID,
-        field,
-        `레벨은 ${this.config.blindLevel.min}-${this.config.blindLevel.max} 사이여야 합니다`,
-      );
-    }
+    const { small, big, ante = 0 } = blindLevel;
 
     // 블라인드 크기 검증
     if (typeof small !== 'number' || small <= 0) {
@@ -529,28 +529,30 @@ export class InputValidator {
       );
     }
 
-    // 안테 검증
-    if (typeof ante !== 'number' || ante < 0) {
+    // 토너먼트 블라인드 구조 검증
+    const validLevel = this.config.blindLevel.validLevels.find(
+      (level) => level.small === small && level.big === big && level.ante === ante,
+    );
+
+    if (!validLevel) {
+      const validLevelsStr = this.config.blindLevel.validLevels
+        .map((level) => `${level.small}/${level.big}`)
+        .join(', ');
       return result.addError(
-        `유효하지 않은 안테입니다: ${ante}`,
+        `유효하지 않은 블라인드 구조입니다: ${small}/${big} (안테: ${ante})`,
         ERROR_CODES.BLIND_STRUCTURE_INVALID,
         field,
-        '안테는 0 이상이어야 합니다',
+        `유효한 블라인드 레벨: ${validLevelsStr}. 안테는 항상 0이어야 합니다.`,
       );
     }
 
-    // 지속 시간 검증
-    if (
-      duration &&
-      (typeof duration !== 'number' ||
-        duration <= 0 ||
-        duration > this.config.blindLevel.maxDuration)
-    ) {
-      result.addWarning(
-        `블라인드 지속 시간이 권장 범위를 벗어납니다: ${duration}분`,
-        ERROR_CODES.BLIND_LEVEL_INVALID,
+    // 안테 검증 - 새로운 토너먼트는 안테가 없음
+    if (ante !== 0) {
+      return result.addError(
+        `이 토너먼트에서는 안테가 허용되지 않습니다: ${ante}`,
+        ERROR_CODES.BLIND_STRUCTURE_INVALID,
         field,
-        `권장 범위: 1-${this.config.blindLevel.maxDuration}분`,
+        '안테는 반드시 0이어야 합니다',
       );
     }
 
