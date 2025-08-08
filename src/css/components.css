@@ -443,6 +443,13 @@
     opacity: 0.5;
     filter: grayscale(0.5);
   }
+
+  /* 올인 플레이어는 밝게 */
+  &.all-in {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: scale(1) !important;
+  }
 }
 
 /* 칩 스택 표시 */

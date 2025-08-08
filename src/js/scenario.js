@@ -144,11 +144,16 @@ export function applyScenarioToTable(scenario) {
       }
     }
 
-    // 플레이어 스택 업데이트
-    updatePlayerStacks(scenario.situation.stacks);
-
-    // 플레이어 포지션 업데이트
+    // 플레이어 포지션 업데이트 (먼저 포지션 설정)
     updatePlayerPositions(scenario.situation.positions);
+
+    // 플레이어 스택 업데이트
+    updatePlayerStacks(scenario.situation.remainingStacks || scenario.situation.stacks);
+
+    // 플레이어 베팅 업데이트 (새로운 구조) - 포지션 설정 후에
+    if (scenario.situation.playerBets) {
+      updatePlayerBets(scenario.situation.playerBets);
+    }
 
     // 현재 플레이어 설정 (HERO 포지션)
     setCurrentPlayer(scenario.situation.heroPosition);
@@ -156,8 +161,8 @@ export function applyScenarioToTable(scenario) {
     // 플레이어 홀카드 표시
     displayPlayerCards(scenario.situation.heroCards);
 
-    // 팟 사이즈 업데이트
-    updatePotSize(scenario.situation.potSize || 0);
+    // 팟 사이즈 업데이트 (안테만 표시)
+    updatePotSize(scenario.situation.pot || scenario.situation.potSize || 0);
 
     // 액션 히스토리 표시
     displayActionHistory(scenario.situation.actions || []);
@@ -201,6 +206,72 @@ export function applyScenarioToTable(scenario) {
 }
 
 /**
+ * 플레이어 베팅 업데이트 (새로운 구조)
+ */
+function updatePlayerBets(playerBets) {
+  if (!currentScenario || !playerBets) {
+    return;
+  }
+
+  const { positions } = currentScenario.situation;
+  const heroPosition = positions.find((pos) => pos.includes('HERO'));
+  if (!heroPosition) {
+    return;
+  }
+
+  // HERO의 실제 포지션 추출
+  const heroActualPosition = heroPosition.split('(')[1].split(')')[0];
+  const allPositions = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
+  const heroIndex = allPositions.indexOf(heroActualPosition);
+
+  // 좌석 매핑 계산
+  const seatMapping = calculateSeatMapping(positions, heroIndex);
+
+  // 블라인드 레벨 가져오기
+  const bigBlind = currentScenario.situation.blindLevel?.big || 100;
+
+  // 각 좌석에 베팅 적용
+  Object.entries(playerBets).forEach(([betPosition, betAmount]) => {
+    // 좌석 매핑에서 해당 포지션의 좌석 인덱스 찾기
+    const seatIndex = Object.keys(seatMapping).find((index) => {
+      const mapping = seatMapping[index];
+      if (betPosition === 'HERO') {
+        return mapping.isHero;
+      }
+      return mapping.displayPosition === betPosition;
+    });
+
+    if (seatIndex !== undefined) {
+      const seatNum = parseInt(seatIndex, 10);
+      const playerCard = document.querySelector(`[data-player-index="${seatNum}"]`);
+
+      if (playerCard) {
+        const betElement = playerCard.querySelector('.player-bet');
+
+        if (betAmount > 0 && betElement) {
+          // 베팅이 있으면 표시
+          const betDisplayElement = betElement.querySelector('.bet-display');
+
+          if (betDisplayElement) {
+            const bbAmount = (betAmount / bigBlind).toFixed(1);
+            betDisplayElement.textContent = `${bbAmount} BB`;
+          }
+
+          betElement.style.display = 'block';
+        } else if (betElement) {
+          // 베팅이 없으면 숨김
+          betElement.style.display = 'none';
+        }
+      }
+    }
+  });
+
+  if (config.debug) {
+    console.info('Player bets updated:', playerBets);
+  }
+}
+
+/**
  * 플레이어 스택 업데이트 (HERO 고정 좌석에 맞춰 업데이트)
  */
 function updatePlayerStacks(stacks) {
@@ -237,9 +308,14 @@ function updatePlayerStacks(stacks) {
       const seatNum = parseInt(seatIndex, 10);
       window.updatePlayerChips(seatNum, chips);
 
-      // 스택이 0인 플레이어는 eliminated 상태로 표시
+      // 스택이 0인 플레이어는 eliminated 상태로 표시 (테이블에서 제외)
       if (chips === 0 && window.updatePlayerState) {
         window.updatePlayerState(seatNum, 'eliminated');
+        // 스택이 0이면 해당 카드를 숨김 처리
+        const playerCard = document.querySelector(`[data-player-index="${seatNum}"]`);
+        if (playerCard) {
+          playerCard.style.display = 'none';
+        }
       }
     }
   });
@@ -267,7 +343,7 @@ function updatePlayerPositions(positions) {
 
   // 각 UI 자리에 플레이어 배치
   for (let seatIndex = 0; seatIndex < 6; seatIndex++) {
-    const playerCard = document.querySelector(`[data-player-index=\"${seatIndex}\"]`);
+    const playerCard = document.querySelector(`[data-player-index="${seatIndex}"]`);
     const positionInfo = seatMapping[seatIndex];
 
     if (playerCard && positionInfo) {
@@ -311,7 +387,7 @@ function calculateSeatMapping(positions, heroPositionIndex) {
     console.log('🗺️ calculateSeatMapping:', positions, 'heroIndex:', heroPositionIndex);
   }
 
-  // 각 포지션을 상대적 위치에 배치
+  // 각 포지션을 상대적 위치에 배치 (스택 확인 포함)
   positions.forEach((position) => {
     let actualPosition,
       isHero = false;
@@ -321,6 +397,19 @@ function calculateSeatMapping(positions, heroPositionIndex) {
       isHero = true;
     } else {
       actualPosition = position;
+    }
+
+    // 스택 확인 (올인한 플레이어도 포함)
+    const stackKey = isHero ? 'HERO' : actualPosition;
+    const stacks =
+      currentScenario?.situation?.remainingStacks || currentScenario?.situation?.stacks || {};
+    const playerBets = currentScenario?.situation?.playerBets || {};
+    const stack = stacks[stackKey] || 0;
+    const bet = playerBets[stackKey] || 0;
+
+    // 스택이 0이고 베팅도 없다면 완전히 제거된 플레이어
+    if (stack === 0 && bet === 0) {
+      return; // 스택도 베팅도 없으면 매핑하지 않음
     }
 
     const positionIndex = allPositions.indexOf(actualPosition);
@@ -348,15 +437,27 @@ function calculateSeatMapping(positions, heroPositionIndex) {
     }
   });
 
-  // 빈 자리 채우기
+  // 빈 자리 숨김 처리 (스택이 0인 플레이어들)
   for (let i = 0; i < 6; i++) {
     if (!seatMapping[i]) {
+      // 빈 자리는 숨김 처리
+      const playerCard = document.querySelector(`[data-player-index="${i}"]`);
+      if (playerCard) {
+        playerCard.style.display = 'none';
+      }
       seatMapping[i] = {
         originalPosition: '',
-        displayPosition: 'Empty',
+        displayPosition: '',
         isHero: false,
         isEmpty: true,
+        isHidden: true,
       };
+    } else {
+      // 활성 플레이어는 표시
+      const playerCard = document.querySelector(`[data-player-index="${i}"]`);
+      if (playerCard) {
+        playerCard.style.display = 'block';
+      }
     }
   }
 
@@ -379,7 +480,7 @@ function calculateRelativeSeat(positionIndex, heroPositionIndex, heroSeatIndex) 
 /**
  * 현재 플레이어 설정 (HERO는 항상 4번 자리)
  */
-function setCurrentPlayer(heroPosition) {
+function setCurrentPlayer(_heroPosition) {
   if (window.updatePlayerState) {
     // 모든 플레이어 비활성화
     for (let i = 0; i < 6; i++) {
@@ -400,7 +501,7 @@ function displayPlayerCards(heroCards) {
 
   // HERO는 항상 3번 인덱스(4번 자리)에 고정
   const heroSeatIndex = 3;
-  const playerCard = document.querySelector(`[data-player-index=\"${heroSeatIndex}\"]`);
+  const playerCard = document.querySelector(`[data-player-index="${heroSeatIndex}"]`);
 
   if (playerCard) {
     const cardsContainer = playerCard.querySelector('.player-cards');
@@ -471,12 +572,8 @@ function displayActionHistory(actions) {
       // 플레이어 이름 요소 찾기
       const playerNameElement = playerCard.querySelector('.player-name');
 
-      // 빈 자리는 건너뛰기
-      if (mapping.isEmpty) {
-        if (playerNameElement) {
-          playerNameElement.textContent = 'Empty';
-          playerNameElement.className = 'player-name empty-seat';
-        }
+      // 빈 자리나 숨겨진 자리는 건너뛰기
+      if (mapping.isEmpty || mapping.isHidden) {
         return;
       }
 
@@ -513,27 +610,55 @@ function displayActionHistory(actions) {
           if (window.updatePlayerState) {
             window.updatePlayerState(seatNum, 'folded');
           }
-        } else if (
-          playerAction.action.toLowerCase() === 'push' ||
-          playerAction.action.toLowerCase() === 'raise'
-        ) {
+        } else if (playerAction.action.toLowerCase() === 'push') {
+          // Push는 올인으로 처리
+          playerCard.classList.add('all-in');
+          if (window.updatePlayerState) {
+            window.updatePlayerState(seatNum, 'all-in');
+          }
+        } else if (playerAction.action.toLowerCase() === 'raise') {
           playerCard.classList.add('aggressive');
         }
       } else {
-        // 아직 액션하지 않은 플레이어 (WAIT 상태)
-        if (playerNameElement) {
-          // WAIT는 HERO 구분 없이 동일하게 표시
-          playerNameElement.textContent = 'WAIT';
-          playerNameElement.className = 'player-name player-status action-wait';
+        // 액션하지 않았지만 스택이 0인 경우 (이미 올인한 상태)
+        const stackKey = mapping.isHero ? 'HERO' : mapping.displayPosition;
+        const stacks =
+          currentScenario?.situation?.remainingStacks || currentScenario?.situation?.stacks || {};
+        const playerBets = currentScenario?.situation?.playerBets || {};
+        const stack = stacks[stackKey] || 0;
+        const bet = playerBets[stackKey] || 0;
 
-          // HERO인 경우 별도 배지 추가
-          if (mapping.isHero) {
-            addHeroBadgeToCard(playerCard);
+        if (stack === 0 && bet > 0) {
+          // 스택이 0이고 베팅이 있으면 올인 상태
+          playerCard.classList.add('all-in');
+          if (playerNameElement) {
+            playerNameElement.textContent = 'ALL IN';
+            playerNameElement.className = 'player-name player-status action-push';
+
+            // HERO인 경우 별도 배지 추가
+            if (mapping.isHero) {
+              addHeroBadgeToCard(playerCard);
+            }
           }
-        }
+          if (window.updatePlayerState) {
+            window.updatePlayerState(seatNum, 'all-in');
+          }
+        } else {
+          // 아직 액션하지 않은 플레이어 (WAIT 상태)
+          if (playerNameElement) {
+            // WAIT는 HERO 구분 없이 동일하게 표시
+            playerNameElement.textContent = 'WAIT';
+            playerNameElement.className = 'player-name player-status action-wait';
 
-        // 플레이어 카드를 기본 상태로 복원
-        playerCard.classList.remove('folded', 'aggressive');
+            // HERO인 경우 별도 배지 추가
+            if (mapping.isHero) {
+              addHeroBadgeToCard(playerCard);
+            }
+          }
+
+          // 플레이어 카드를 기본 상태로 복원 (all-in은 유지)
+          playerCard.classList.remove('folded', 'aggressive');
+        }
       }
     }
   });
@@ -590,24 +715,7 @@ function getActionClass(action) {
   return classMap[action.toLowerCase()] || 'action-default';
 }
 
-/**
- * 포지션으로 플레이어 인덱스 찾기
- */
-function getPlayerIndexByPosition(position) {
-  const positionOrder = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
-
-  // HERO(BTN) 형태인 경우 실제 포지션 추출
-  if (position === 'HERO') {
-    return -1; // HERO만으로는 포지션을 알 수 없음
-  }
-
-  if (position.includes('HERO')) {
-    const actualPosition = position.split('(')[1].split(')')[0];
-    return positionOrder.indexOf(actualPosition);
-  }
-
-  return positionOrder.indexOf(position);
-}
+// getPlayerIndexByPosition function removed - not used
 
 /**
  * 수트 심볼 반환
@@ -703,10 +811,10 @@ function updateScenarioInfoPanel(scenario) {
       handElement.textContent = scenario.situation.heroCards;
     }
 
-    // 스택 (HERO 스택 찾기)
+    // 스택 (HERO 스택 찾기 - 새로운 구조 지원)
     const stackElement = document.getElementById('scenario-stack');
     if (stackElement) {
-      const heroStack = scenario.situation.stacks.HERO;
+      const heroStack = scenario.situation.remainingStacks?.HERO || scenario.situation.stacks?.HERO;
       const bigBlind = scenario.situation.blindLevel?.big || 50;
       const bbAmount = (heroStack / bigBlind).toFixed(1);
       stackElement.textContent = `${bbAmount} BB`;
@@ -725,6 +833,49 @@ function updateScenarioInfoPanel(scenario) {
   } catch (error) {
     console.error('Error updating scenario info panel:', error);
   }
+}
+
+/**
+ * ICM 계산용 총 팟 사이즈 가져오기
+ */
+export function getTotalPotForCalculation() {
+  if (!currentScenario) {
+    return 0;
+  }
+
+  // 새로운 구조에서는 totalPotForCalculation 사용
+  if (currentScenario.situation.totalPotForCalculation !== undefined) {
+    return currentScenario.situation.totalPotForCalculation;
+  }
+
+  // 기존 구조 fallback
+  if (currentScenario.situation.potSize !== undefined) {
+    return currentScenario.situation.potSize;
+  }
+
+  // 수동 계산
+  const pot = currentScenario.situation.pot || 0;
+  const playerBets = currentScenario.situation.playerBets || {};
+  const totalBets = Object.values(playerBets).reduce((sum, bet) => sum + bet, 0);
+
+  return pot + totalBets;
+}
+
+/**
+ * UI 표시용 팟 사이즈 가져오기 (안테만)
+ */
+export function getPotForDisplay() {
+  if (!currentScenario) {
+    return 0;
+  }
+
+  // 새로운 구조에서는 pot 사용 (안테만)
+  if (currentScenario.situation.pot !== undefined) {
+    return currentScenario.situation.pot;
+  }
+
+  // 기존 구조 fallback
+  return currentScenario.situation.potSize || 0;
 }
 
 /**

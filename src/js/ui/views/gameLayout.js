@@ -12,6 +12,7 @@ import {
   updateQuizStats,
   selectNextScenario,
   applyScenarioToTable,
+  getCurrentScenario,
 } from '../../scenario.js';
 
 /**
@@ -156,6 +157,9 @@ function initializePlayerPositions() {
         <div class="player-chips" data-player-index="${index}">
           <span class="chip-bb-main">30.0 BB</span>
           <span class="chip-count-sub">1,500</span>
+        </div>
+        <div class="player-bet" data-player-index="${index}" style="display: none;">
+          <span class="bet-display">0.0 BB</span>
         </div>
         <div class="player-cards">
           <!-- 카드가 여기에 표시됩니다 -->
@@ -350,7 +354,7 @@ function setupEventListeners() {
 
   // 플레이어 카드 클릭 이벤트 (퀴즈 모드용)
   document.querySelectorAll('.player-card').forEach((card, index) => {
-    card.addEventListener('click', (e) => {
+    card.addEventListener('click', (_e) => {
       // 클릭한 플레이어를 액티브로 설정
       document.querySelectorAll('.player-card').forEach((c) => c.classList.remove('active'));
       card.classList.add('active');
@@ -430,6 +434,9 @@ function handleCheckAnswer() {
     // 정답을 시각적으로 표시
     showCorrectAnswer(result.correctAnswer, result.isCorrect);
 
+    // 해설 팝업 표시
+    showExplanationModal(result, evDifference);
+
     // ICM EV 분석 표시
     console.log('🎯 ICM EV 분석 표시 시작...');
     console.log('📋 result.scenario:', result.scenario);
@@ -461,6 +468,119 @@ function handleCheckAnswer() {
 }
 
 /**
+ * 해설 모달 표시
+ */
+function showExplanationModal(result, evDifference) {
+  const scenario = getCurrentScenario();
+  if (!scenario) return;
+
+  const evSign = evDifference > 0 ? '+' : '';
+  const evText = `${evSign}${evDifference.toFixed(1)}% EV`;
+
+  const correctActionText = result.correctAnswer === 'push' ? 'All-in' : 'Fold';
+  const userActionText = result.userAnswer === 'push' ? 'All-in' : 'Fold';
+
+  const statusEmoji = result.isCorrect ? '✅' : '❌';
+  const statusText = result.isCorrect ? '정답' : '오답';
+
+  // 핸드 레인지 정보
+  const handRange = scenario.handRange || {};
+  const pushRange = handRange.pushRange || '없음';
+  const foldRange = handRange.foldRange || '없음';
+
+  // ICM 분석 데이터
+  const icmAnalysis = scenario.icmAnalysis || {};
+  const pushEV = icmAnalysis.pushEV || 0;
+  const foldEV = icmAnalysis.foldEV || 0;
+  const heroCurrentEquity = icmAnalysis.equity?.HERO || 0;
+
+  // Current equity 값 설정
+  const currentEquity = heroCurrentEquity || 0;
+
+  const modalContent = `
+    <div class="explanation-modal-content">
+      <div class="explanation-header">
+        <div class="result-summary">
+          <span class="result-status">${statusEmoji} ${statusText}</span>
+          <span class="ev-difference ${evDifference >= 0 ? 'positive' : 'negative'}">${evText}</span>
+        </div>
+        <div class="action-comparison">
+          <div class="user-action">당신의 선택: <strong>${userActionText}</strong></div>
+          <div class="correct-action">최적 액션: <strong>${correctActionText}</strong></div>
+        </div>
+      </div>
+      
+      <div class="explanation-body">
+        <div class="explanation-section">
+          <h4>🎯 상황 분석</h4>
+          <p>${result.explanation.detailed}</p>
+        </div>
+        
+        <div class="explanation-section">
+          <h4>📊 ICM 분석</h4>
+          <div class="icm-analysis">
+            <div class="equity-info">
+              <div>현재 토너먼트 Equity: <strong>${currentEquity.toFixed(1)}%</strong></div>
+              <div>All-in 시 EV: <strong>${pushEV.toFixed(1)}</strong></div>
+              <div>Fold 시 EV: <strong>${foldEV.toFixed(1)}</strong></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="explanation-section">
+          <h4>🃏 핸드 레인지</h4>
+          <div class="hand-ranges">
+            <div class="range-item">
+              <span class="range-label">Push 레인지:</span>
+              <span class="range-value">${pushRange}</span>
+            </div>
+            <div class="range-item">
+              <span class="range-label">Fold 레인지:</span>
+              <span class="range-value">${foldRange}</span>
+            </div>
+          </div>
+        </div>
+        
+        ${
+          scenario.explanation?.strategy
+            ? `
+        <div class="explanation-section">
+          <h4>💡 전략적 고려사항</h4>
+          <p>${scenario.explanation.strategy}</p>
+        </div>
+        `
+            : ''
+        }
+      </div>
+    </div>
+  `;
+
+  const modal = Modal.create({
+    title: '상세 해설',
+    content: modalContent,
+    size: 'lg',
+    footer: [
+      {
+        text: '확인',
+        variant: 'secondary',
+        onClick: (e, modalInstance) => modalInstance.close(),
+      },
+      {
+        text: '다음 시나리오',
+        variant: 'primary',
+        onClick: (e, modalInstance) => {
+          modalInstance.close();
+          // 다음 시나리오 로드
+          handleNewScenario();
+        },
+      },
+    ],
+  });
+
+  modal.open();
+}
+
+/**
  * 퀴즈 피드백 표시
  */
 function showQuizFeedback(result, evDifference) {
@@ -483,7 +603,7 @@ function showQuizFeedback(result, evDifference) {
 /**
  * 상세 해설 모달 표시
  */
-function showDetailedExplanation(result, evDifference) {
+function showDetailedExplanation(result, _evDifference) {
   const { scenario, explanation, icmAnalysis, handRange } = result;
 
   // 해설 콘텐츠 생성
@@ -696,9 +816,7 @@ function displayICMAnalysis(icmAnalysis, isCorrect, userAnswer) {
   const { difference } = icmAnalysis;
   const isPositive = difference > 0;
 
-  // 사용자가 선택한 옵션의 EV
-  const userEV = userAnswer.toLowerCase() === 'push' ? pushEV : foldEV;
-  const correctEV = userAnswer.toLowerCase() === 'push' ? foldEV : pushEV;
+  // EV 값들은 화면에 직접 사용
 
   // EV 차이 색상
   const evColor = isPositive ? '#10b981' : '#ef4444';
@@ -751,6 +869,27 @@ function displayICMAnalysis(icmAnalysis, isCorrect, userAnswer) {
                 : `아쉽습니다. 더 나은 선택이 있었습니다. <strong>-${Math.abs(difference).toFixed(1)}EV</strong> 손실입니다.`
             }
           </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card explanation-card" style="margin-top: var(--spacing-4);">
+      <div class="card-content">
+        <h4>💡 해설</h4>
+        <div class="detailed-explanation">
+          <p class="explanation-detailed">${getCurrentScenario()?.explanation?.detailed || '상세 해설이 없습니다.'}</p>
+        </div>
+        
+        <div class="hand-ranges" style="margin-top: var(--spacing-4);">
+          <h5>📋 핸드 범위</h5>
+          <div class="range-info">
+            <div class="push-range">
+              <strong>푸시 범위:</strong> ${getCurrentScenario()?.handRange?.pushRange || 'N/A'}
+            </div>
+            <div class="fold-range" style="margin-top: var(--spacing-2);">
+              <strong>폴드 범위:</strong> ${getCurrentScenario()?.handRange?.foldRange || 'N/A'}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -842,15 +981,7 @@ function resetQuizUI() {
 /**
  * 수트 심볼 반환 (유틸리티 함수)
  */
-function getSuitSymbol(suit) {
-  const symbols = {
-    h: '♥',
-    d: '♦',
-    c: '♣',
-    s: '♠',
-  };
-  return symbols[suit] || suit;
-}
+// getSuitSymbol function removed - not used
 
 /**
  * 딜러 버튼 기능 제거됨 - 퀴즈 모드에서는 필요 없음
