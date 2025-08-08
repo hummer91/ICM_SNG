@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HERO Positioning Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .pass { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .fail { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .seat-mapping { margin: 5px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>HERO Positioning System Test</h1>
+    <div id="test-results"></div>
+
+    <script>
+        // Test the HERO positioning logic
+        function calculateSeatMapping(positions, heroPositionIndex) {
+            const allPositions = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
+            const seatMapping = {};
+            const heroSeatIndex = 3;
+            
+            positions.forEach(position => {
+                let actualPosition, isHero = false;
+                
+                if (position.includes('HERO')) {
+                    actualPosition = position.split('(')[1].split(')')[0];
+                    isHero = true;
+                } else {
+                    actualPosition = position;
+                }
+                
+                const positionIndex = allPositions.indexOf(actualPosition);
+                
+                if (isHero) {
+                    seatMapping[heroSeatIndex] = {
+                        originalPosition: position,
+                        displayPosition: actualPosition,
+                        isHero: true,
+                        isEmpty: false
+                    };
+                } else {
+                    const relativeSeat = calculateRelativeSeat(positionIndex, heroPositionIndex, heroSeatIndex);
+                    if (relativeSeat !== -1) {
+                        seatMapping[relativeSeat] = {
+                            originalPosition: position,
+                            displayPosition: actualPosition,
+                            isHero: false,
+                            isEmpty: false
+                        };
+                    }
+                }
+            });
+            
+            for (let i = 0; i < 6; i++) {
+                if (!seatMapping[i]) {
+                    seatMapping[i] = {
+                        originalPosition: '',
+                        displayPosition: 'Empty',
+                        isHero: false,
+                        isEmpty: true
+                    };
+                }
+            }
+            
+            return seatMapping;
+        }
+
+        function calculateRelativeSeat(positionIndex, heroPositionIndex, heroSeatIndex) {
+            let distance = (positionIndex - heroPositionIndex + 6) % 6;
+            let relativeSeat = (heroSeatIndex + distance) % 6;
+            return relativeSeat;
+        }
+
+        function runTests() {
+            const results = document.getElementById('test-results');
+            const testCases = [
+                {
+                    name: 'HERO at BTN',
+                    positions: ['UTG', 'MP', 'HERO(BTN)', 'SB', 'BB'],
+                    heroPosition: 'BTN',
+                    expected: { heroSeat: 3, utgSeat: 0, mpSeat: 1, sbSeat: 4, bbSeat: 5 }
+                },
+                {
+                    name: 'HERO at SB', 
+                    positions: ['UTG', 'MP', 'CO', 'BTN', 'HERO(SB)', 'BB'],
+                    heroPosition: 'SB',
+                    expected: { heroSeat: 3, utgSeat: 5, mpSeat: 0, coSeat: 1, btnSeat: 2, bbSeat: 4 }
+                },
+                {
+                    name: 'HERO at BB',
+                    positions: ['UTG', 'MP', 'CO', 'BTN', 'SB', 'HERO(BB)'],
+                    heroPosition: 'BB', 
+                    expected: { heroSeat: 3, utgSeat: 4, mpSeat: 5, coSeat: 0, btnSeat: 1, sbSeat: 2 }
+                },
+                {
+                    name: 'HERO at UTG',
+                    positions: ['HERO(UTG)', 'MP', 'CO', 'BTN', 'SB', 'BB'],
+                    heroPosition: 'UTG',
+                    expected: { heroSeat: 3, mpSeat: 4, coSeat: 5, btnSeat: 0, sbSeat: 1, bbSeat: 2 }
+                }
+            ];
+
+            testCases.forEach(testCase => {
+                const allPositions = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
+                const heroIndex = allPositions.indexOf(testCase.heroPosition);
+                const seatMapping = calculateSeatMapping(testCase.positions, heroIndex);
+                
+                let passed = true;
+                let details = [];
+                
+                // Check if HERO is at seat 3
+                if (!seatMapping[3] || !seatMapping[3].isHero) {
+                    passed = false;
+                    details.push('❌ HERO not at seat 3');
+                } else {
+                    details.push('✅ HERO at seat 3');
+                }
+                
+                // Check other positions
+                Object.keys(testCase.expected).forEach(key => {
+                    if (key === 'heroSeat') return;
+                    
+                    const position = key.replace('Seat', '').toUpperCase();
+                    const expectedSeat = testCase.expected[key];
+                    const actualMapping = seatMapping[expectedSeat];
+                    
+                    if (!actualMapping || actualMapping.displayPosition !== position) {
+                        passed = false;
+                        details.push(`❌ ${position} expected at seat ${expectedSeat}, but found ${actualMapping ? actualMapping.displayPosition : 'empty'}`);
+                    } else {
+                        details.push(`✅ ${position} at seat ${expectedSeat}`);
+                    }
+                });
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+                resultDiv.innerHTML = `
+                    <h3>${passed ? '✅' : '❌'} ${testCase.name}</h3>
+                    <div class="seat-mapping">
+                        ${details.join('<br>')}
+                    </div>
+                    <details>
+                        <summary>Seat Mapping Details</summary>
+                        <pre>${JSON.stringify(seatMapping, null, 2)}</pre>
+                    </details>
+                `;
+                
+                results.appendChild(resultDiv);
+            });
+        }
+
+        // Run tests when page loads
+        runTests();
+    </script>
+</body>
+</html>

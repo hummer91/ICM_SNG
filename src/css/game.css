@@ -158,14 +158,34 @@
     var(--shadow-xl);
 }
 
+.player-card.eliminated {
+  opacity: 0.3;
+  filter: grayscale(1);
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+.player-card.eliminated .player-name {
+  background: rgba(100, 100, 100, 0.8);
+  color: #666;
+  border-color: #666;
+  animation: none;
+}
+
+.player-card.eliminated .player-position {
+  opacity: 0.5;
+}
+
 .player-info {
-  padding: var(--spacing-2) var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-2); /* 상하 패딩 더 증가 */
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-1);
-  justify-content: center;
-  padding-top: var(--spacing-3);
+  gap: var(--spacing-3); /* 간격 더 증가 */
+  justify-content: space-between; /* 공간 분배 */
+  padding-top: var(--spacing-5); /* 포지션 라벨을 위한 여유 공간 증가 */
+  min-height: 110px; /* 최소 높이 증가 */
+  position: relative;
 }
 
 .player-header {
@@ -175,8 +195,8 @@
 
 .player-name {
   position: absolute;
-  top: -30px;
-  left: 8px;
+  top: -20px; /* 포지션과 동일한 겹침 정도 */
+  left: 8px; /* 포지션과 대칭되도록 조정 */
   font-weight: var(--font-weight-bold);
   color: #5e6ad2;
   font-size: 15px;
@@ -184,36 +204,72 @@
   background: rgba(16, 17, 18, 0.95);
   padding: 6px 14px;
   border-radius: 8px;
-  z-index: 100;
+  z-index: 12; /* 포지션보다 높은 z-index */
   border: 2px solid #5e6ad2;
   display: block !important;
   visibility: visible !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.player-name.hero-player {
+  background: linear-gradient(135deg, var(--brand-purple) 0%, #7c3aed 100%);
+  color: white;
+  border-color: var(--brand-purple);
+  font-weight: var(--font-weight-bold);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(94, 106, 210, 0.4);
+  animation: heroGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes heroGlow {
+  from {
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(94, 106, 210, 0.4);
+  }
+  to {
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      0 0 25px rgba(94, 106, 210, 0.6);
+  }
+}
+
 .player-position {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: var(--font-size-xs);
-  color: var(--text-primary);
-  background: var(--bg-primary);
-  padding: 4px 10px;
-  border-radius: var(--radius-md);
+  top: -20px; /* 액션 버튼과 동일한 겹침 정도 */
+  right: 8px; /* 액션 버튼과 대칭되도록 조정 */
+  font-size: 11px;
+  color: white;
+  background: linear-gradient(135deg, #4f46e5, #5e6ad2);
+  padding: 6px 12px;
+  border-radius: 8px;
   font-weight: var(--font-weight-bold);
   white-space: nowrap;
-  border: 1px solid var(--border-primary);
-  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10; /* 액션 버튼보다 낮게 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
 }
 
 .player-chips {
   display: flex;
+  flex-direction: column; /* 세로 배치 */
   align-items: center;
   justify-content: center;
-  padding: 0;
+  gap: 4px; /* BB와 칩수 사이 간격 증가 */
+  padding: 10px 12px; /* 패딩 증가 */
   width: 100%;
+  min-width: 95px;
+  max-width: 125px; /* 최대 너비 줄임 */
   cursor: pointer;
   transition: all var(--duration-200) var(--ease-out);
+  background: rgba(0, 0, 0, 0.6); /* 배경 더 진하게 */
+  border-radius: 10px;
+  backdrop-filter: blur(8px); /* 블러 효과 강화 */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* 테두리 강화 */
+  margin-top: 8px; /* 상단 여백으로 HERO 배지와 간격 확보 */
 }
 
 /* 칩 아이콘 제거됨 */
@@ -221,15 +277,45 @@
   display: none;
 }
 
+/* chip-stack 제거됨 - player-chips에서 직접 표시
 .chip-stack {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
   flex: 1;
   min-width: 0;
   max-width: 80px;
+  gap: 2px;
+}
+*/
+
+/* BB 값 - 메인 표시 (크고 굵게) */
+.chip-bb-main {
+  font-size: 17px; /* 크기 조정 */
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  line-height: 1.1;
+  white-space: nowrap;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9); /* 텍스트 그림자 강화 */
+  letter-spacing: 0.3px; /* 자간 추가 */
+  text-align: center;
 }
 
+/* 칩 수량 - 서브 표시 (작고 연하게) */
+.chip-count-sub {
+  font-size: 11px; /* 크기 조정 */
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  line-height: 1.1;
+  white-space: nowrap;
+  opacity: 0.9; /* 불투명도 조정 */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* 텍스트 그림자 */
+  text-align: center;
+}
+
+/* 기존 클래스 유지 (하위 호환성) */
 .chip-count {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-bold);
@@ -249,7 +335,56 @@
   margin-top: 2px;
 }
 
-/* 칩 편집 모드 */
+/* 플레이어 홀카드 스타일 */
+.player-cards {
+  margin-top: var(--spacing-3);
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+}
+
+.hole-cards {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.hole-cards .card {
+  width: 32px;
+  height: 44px;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border: 2px solid #333;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: var(--font-weight-bold);
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all var(--duration-200) var(--ease-out);
+  font-family: var(--font-mono);
+  text-shadow: none;
+}
+
+.hole-cards .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* 플레이어 카드 활성 상태일 때 홀카드 강조 */
+.player-card.active .hole-cards .card {
+  border-color: var(--brand-purple);
+  box-shadow: 0 0 0 1px var(--brand-purple), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 칩 편집 모드 (제거됨 - 퀴즈 모드에서는 사용하지 않음) */
 .chip-count.editing {
   background: var(--bg-primary);
   border: 1px solid var(--brand-purple);
@@ -267,7 +402,7 @@
   color: var(--text-secondary);
 }
 
-/* 딜러 버튼 - Linear 스타일 (D = Dealer, 딜러 위치 표시) */
+/* dealer-button 제거됨 - 퀴즈 모드에서는 필요 없음
 .dealer-button {
   position: absolute;
   width: 48px;
@@ -289,6 +424,7 @@
   font-size: var(--font-size-lg);
   cursor: help;
 }
+*/
 
 .dealer-button:hover::after {
   content: 'Dealer Position';
@@ -327,9 +463,11 @@
   }
 }
 
+/* dealer-button.moving 제거됨
 .dealer-button.moving {
   animation: dealerButtonMove 1s var(--ease-out);
 }
+*/
 
 @keyframes dealerButtonMove {
   0% {
@@ -444,6 +582,7 @@
   height: 60px;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
+  position: relative;
 }
 
 .all-in-button {
@@ -673,6 +812,576 @@
   left: 100%;
 }
 
+/* 시나리오 정보 패널 스타일 */
+.scenario-info-card {
+  background: var(--bg-secondary);
+  margin-bottom: var(--spacing-4);
+}
+
+.scenario-content {
+  padding: var(--spacing-4);
+}
+
+.scenario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-3);
+}
+
+.scenario-header h4 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.scenario-meta {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.difficulty-badge {
+  padding: 4px 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.difficulty-badge.beginner {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.difficulty-badge.intermediate {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.difficulty-badge.advanced {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.scenario-number {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.scenario-description {
+  margin-bottom: var(--spacing-4);
+}
+
+.scenario-description p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.scenario-situation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.situation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-2) 0;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.situation-item:last-child {
+  border-bottom: none;
+}
+
+.situation-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.situation-value {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-mono);
+}
+
+/* 퀴즈 컨트롤 버튼들 */
+.quiz-control-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--border-primary);
+}
+
+.quiz-control-btn {
+  height: 48px;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--duration-200) var(--ease-out);
+}
+
+.quiz-control-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.quiz-action-btn.selected {
+  border-color: #8b5cf6 !important;
+  background: rgba(139, 92, 246, 0.1) !important;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.4) !important;
+  transform: scale(1.02) !important;
+}
+
+/* 정답/오답 표시 - 가장 강력한 선택자 우선순위 */
+.action-buttons .quiz-action-btn.correct-answer,
+button.quiz-action-btn.correct-answer,
+.quiz-action-btn.correct-answer,
+.action-buttons button.correct-answer {
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.3) !important;
+  background-color: rgba(16, 185, 129, 0.3) !important;
+  color: #10b981 !important;
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.6) !important;
+  animation: correctAnswerPulse 2s ease-in-out infinite !important;
+  transform: scale(1.1) !important;
+  z-index: 10 !important;
+}
+
+.action-buttons .quiz-action-btn.wrong-answer,
+button.quiz-action-btn.wrong-answer,
+.quiz-action-btn.wrong-answer,
+.action-buttons button.wrong-answer {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.3) !important;
+  background-color: rgba(239, 68, 68, 0.3) !important;
+  color: #ef4444 !important;
+  box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.6) !important;
+  transform: scale(1.08) !important;
+  z-index: 10 !important;
+}
+
+@keyframes correctAnswerPulse {
+  0% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5) !important;
+    transform: scale(1.08) !important;
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.7) !important;
+    transform: scale(1.12) !important;
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5) !important;
+    transform: scale(1.08) !important;
+  }
+}
+
+/* 정답/오답 아이콘 */
+.answer-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: var(--font-weight-bold);
+  animation: iconAppear 0.3s ease-out;
+}
+
+.correct-icon {
+  background: #10b981 !important;
+  color: white !important;
+  border: 3px solid white !important;
+  box-shadow: 0 0 0 2px #10b981 !important;
+  z-index: 20 !important;
+}
+
+.wrong-icon {
+  background: #ef4444 !important;
+  color: white !important;
+  border: 3px solid white !important;
+  box-shadow: 0 0 0 2px #ef4444 !important;
+  z-index: 20 !important;
+}
+
+@keyframes iconAppear {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* 플레이어 액션 표시 */
+.player-action {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 15;
+  animation: actionAppear 0.3s ease-out;
+  border: 2px solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+
+@keyframes actionAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 액션 타입별 스타일 */
+.action-fold {
+  background: rgba(107, 114, 128, 0.9);
+  color: white;
+  border-color: #6b7280;
+}
+
+.action-call {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.action-raise,
+.action-push {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border-color: #ef4444;
+}
+
+.action-check {
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+  border-color: #22c55e;
+}
+
+.action-default {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--border-primary);
+}
+
+/* 플레이어 상태별 스타일 */
+.player-status.action-fold,
+.player-name.action-fold {
+  background: #6b7280 !important;
+  color: white !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.player-status.action-raise,
+.player-status.action-push,
+.player-name.action-raise,
+.player-name.action-push {
+  background: #ef4444 !important;
+  color: white !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  animation: pulseRed 2s infinite;
+}
+
+.player-status.action-call,
+.player-name.action-call {
+  background: #3b82f6 !important;
+  color: white !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.player-status.action-wait,
+.player-name.action-wait {
+  background: #f59e0b !important;
+  color: white !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  animation: pulseYellow 3s infinite;
+}
+
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+@keyframes pulseYellow {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+  50% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* 폴드한 플레이어 카드 전체 스타일 */
+.player-card.folded {
+  opacity: 0.4;
+  filter: grayscale(0.8);
+  transform: scale(0.95);
+}
+
+.player-card.folded .player-name {
+  opacity: 1; /* 상태 표시는 선명하게 */
+  animation: none;
+}
+
+/* 공격적인 액션을 한 플레이어 카드 강조 */
+.player-card.aggressive {
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.player-card.aggressive .player-name {
+  animation: pulseRed 2s infinite;
+}
+
+/* HERO 배지 스타일 (기존 - 인라인용) */
+.hero-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7) !important;
+  color: white !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  font-size: 9px !important;
+  font-weight: bold !important;
+  margin-left: 8px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(139, 92, 246, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  animation: heroGlow 3s ease-in-out infinite !important;
+  white-space: nowrap !important;
+  position: relative;
+  z-index: 10;
+}
+
+/* HERO 배지 스타일 (분리형 - 카드 내부용) */
+.hero-badge-separate {
+  position: absolute;
+  top: 35%; /* BB 값보다 위쪽에 배치 */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(139, 92, 246, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  animation: heroGlow 3s ease-in-out infinite;
+  white-space: nowrap;
+  z-index: 5; /* 칩 정보보다 낮게 설정 */
+  min-width: 45px;
+  text-align: center;
+}
+
+/* HERO 상태일 때 전체 플레이어 이름 스타일 강화 */
+.player-status.hero-status {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  flex-wrap: wrap !important;
+}
+
+@keyframes heroGlow {
+  0% { 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(139, 92, 246, 0.7) !important; 
+  }
+  50% { 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(139, 92, 246, 0.4) !important; 
+  }
+  100% { 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(139, 92, 246, 0) !important; 
+  }
+}
+
+/* ICM EV 분석 패널 */
+.icm-analysis-panel {
+  margin-bottom: var(--spacing-4);
+  animation: slideInUp 0.5s ease-out;
+}
+
+.icm-analysis-card {
+  background: var(--bg-secondary);
+  border: 2px solid var(--brand-purple);
+  box-shadow: 
+    var(--shadow-lg),
+    0 0 20px rgba(94, 106, 210, 0.2);
+}
+
+.icm-analysis-card h4 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-4) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.ev-comparison {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+  padding: var(--spacing-4);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+}
+
+.ev-option {
+  text-align: center;
+  padding: var(--spacing-3);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--border-primary);
+  min-width: 120px;
+  transition: all var(--duration-200) var(--ease-out);
+}
+
+.ev-option.user-choice {
+  background: rgba(94, 106, 210, 0.1);
+  border-color: var(--brand-purple);
+  box-shadow: 0 0 0 2px rgba(94, 106, 210, 0.3);
+}
+
+.ev-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+  margin-bottom: var(--spacing-2);
+}
+
+.action-text {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.choice-indicator {
+  font-size: var(--font-size-xs);
+  color: var(--brand-purple);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.ev-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-mono);
+}
+
+.vs-divider {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-secondary);
+  padding: 0 var(--spacing-3);
+}
+
+.ev-difference {
+  text-align: center;
+  padding: var(--spacing-4);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-4);
+}
+
+.difference-label {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-2);
+  font-weight: var(--font-weight-medium);
+}
+
+.difference-value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-mono);
+  margin-bottom: var(--spacing-2);
+}
+
+.difference-explanation {
+  display: block;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  margin-top: var(--spacing-2);
+}
+
+.ev-explanation {
+  text-align: center;
+  padding: var(--spacing-3);
+  background: var(--bg-quaternary);
+  border-radius: var(--radius-md);
+}
+
+.explanation-text {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* 반응형 디자인 */
 @media (max-width: 1200px) {
   .game-container {
@@ -724,33 +1433,70 @@
     height: 95px !important;
   }
 
+  /* dealer-button 모바일 스타일 제거됨
   .dealer-button {
     width: 40px;
     height: 40px;
     font-size: var(--font-size-base);
   }
+  */
 
   .player-chips {
-    min-width: 90px;
-    max-width: 130px;
-    padding: var(--spacing-1) var(--spacing-2);
+    min-width: 85px;
+    max-width: 115px;
+    padding: 8px 10px; /* 모바일용 패딩 조정 */
+    margin-top: 6px; /* HERO 배지와 간격 */
   }
 
+  /* 새로운 구조 - 모바일 최적화 */
+  .chip-bb-main {
+    font-size: 14px;
+  }
+
+  .chip-count-sub {
+    font-size: 10px;
+  }
+
+  .player-position {
+    padding: 4px 8px; /* 모바일용 패딩 축소 */
+    font-size: 10px;
+  }
+
+  .hero-badge {
+    padding: 2px 6px !important;
+    font-size: 8px !important;
+    margin-left: 6px !important;
+  }
+
+  .hero-badge-separate {
+    top: 32%; /* 모바일에서도 BB 값보다 위쪽에 */
+    padding: 3px 8px;
+    font-size: 8px;
+    min-width: 40px;
+  }
+
+  .hole-cards {
+    padding: 4px 8px; /* 모바일용 패딩 조정 */
+  }
+
+  .hole-cards .card {
+    width: 28px;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  /* chip-stack 모바일 스타일 제거됨
+  .chip-stack {
+    max-width: 75px;
+  }
+  */
+
+  /* 기존 클래스 (하위 호환성) */
   .chip-count {
     font-size: var(--font-size-sm);
   }
 
   .chip-bb {
     font-size: 10px;
-  }
-
-  .chip-icon {
-    width: 14px;
-    height: 14px;
-    font-size: 7px;
-  }
-
-  .chip-stack {
-    max-width: 75px;
   }
 }

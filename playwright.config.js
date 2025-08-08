@@ -18,53 +18,92 @@ export default defineConfig({
   
   // 전역 설정
   use: {
-    // 기본 URL
-    baseURL: 'http://localhost:5173',
+    // 기본 URL (ICM 포커 앱)
+    baseURL: 'http://localhost:8080',
     
-    // 스크린샷 설정
+    // 헤드리스 모드 강제 (시스템 의존성 문제 회피)
+    headless: true,
+    
+    // 스크린샷 설정 (포커 게임 UI 캡처 중요)
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     
     // 추적 설정
     trace: 'on-first-retry',
     
-    // 액션 타임아웃
-    actionTimeout: 10 * 1000,
-    
-    // 네비게이션 타임아웃
+    // 타임아웃 설정 (JavaScript 기반 포커 앱)
+    actionTimeout: 15 * 1000, // 포커 애니메이션 고려
     navigationTimeout: 30 * 1000,
+    
+    // 포커 게임에 적합한 뷰포트
+    viewport: { width: 1280, height: 720 },
+    
+    // 로컬 스토리지 접근 (퀴즈 통계 저장)
+    storageState: undefined,
+    
+    // 콘솔 로그 캡처 (ICM 계산 디버깅용)
+    launchOptions: {
+      args: ['--disable-web-security', '--disable-features=VizDisplayCompositor']
+    }
   },
 
-  // 프로젝트 설정 (브라우저별)
+  // 프로젝트 설정 (ICM 포커 앱 특화)
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'chromium-desktop',
+      use: { 
+        ...devices['Desktop Chrome'],
+        headless: true, // 헤드리스 모드 강제
+      },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: 'firefox-desktop', 
+      use: { 
+        ...devices['Desktop Firefox'],
+        headless: true, // 헤드리스 모드 강제
+      },
     },
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: 'webkit-desktop',
+      use: { 
+        ...devices['Desktop Safari'],
+        headless: true, // 헤드리스 모드 강제
+      },
     },
-    // 모바일 테스트
+    // 모바일 포커 테스트 (반응형 UI)
     {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      name: 'mobile-chrome',
+      use: { 
+        ...devices['Pixel 5'],
+        headless: true,
+      },
     },
     {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      name: 'mobile-safari',
+      use: { 
+        ...devices['iPhone 12'],
+        headless: true,
+      },
+    },
+    // 태블릿 테스트 (포커 테이블 최적 크기)
+    {
+      name: 'tablet-landscape',
+      use: {
+        ...devices['iPad Pro landscape'],
+        headless: true,
+      },
     },
   ],
 
-  // 로컬 개발 서버 설정
+  // 로컬 개발 서버 설정 (ICM 포커 앱)
   webServer: {
-    command: 'npm run dev',
-    port: 5173,
+    command: 'python3 -m http.server 8080',
+    port: 8080,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    cwd: '.', // 현재 디렉토리에서 서버 실행
+    env: {
+      NODE_ENV: 'test'
+    }
   },
 });

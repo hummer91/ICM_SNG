@@ -3,9 +3,16 @@
  * @module ui/views/gameLayout
  */
 
-import { Button, Card } from '../../components/index.js';
+import { Button, Card, Toast, Modal } from '../../components/index.js';
 import { POSITIONS, UI_CONSTANTS } from '../../utils/constants.js';
 import config from '../../../config/environment.js';
+import {
+  evaluateQuizAnswer,
+  calculateEVDifference,
+  updateQuizStats,
+  selectNextScenario,
+  applyScenarioToTable,
+} from '../../scenario.js';
 
 /**
  * 게임 레이아웃 초기화
@@ -61,10 +68,6 @@ export function initializeGameLayout() {
                 <!-- 동적으로 생성됩니다 -->
               </div>
               
-              <!-- 딜러 버튼 -->
-              <div class="dealer-button" id="dealer-button">
-                <span>D</span>
-              </div>
             </div>
           </div>
         </div>
@@ -105,8 +108,7 @@ export function initializeGameLayout() {
   // 윈도우 리사이즈 이벤트 리스너
   window.addEventListener('resize', debounce(updatePlayerPositionsOnResize, 250));
 
-  // 딜러 버튼 초기 위치 설정
-  updateDealerButton(0);
+  // 딜러 버튼 제거됨
 
   // 게임 상태 초기화
   initializeGameState();
@@ -152,10 +154,8 @@ function initializePlayerPositions() {
       <span class="player-position">${position}</span>
       <div class="player-info">
         <div class="player-chips" data-player-index="${index}">
-          <div class="chip-stack">
-            <span class="chip-count" contenteditable="false">1,500</span>
-            <span class="chip-bb">30.0 BB</span>
-          </div>
+          <span class="chip-bb-main">30.0 BB</span>
+          <span class="chip-count-sub">1,500</span>
         </div>
         <div class="player-cards">
           <!-- 카드가 여기에 표시됩니다 -->
@@ -174,8 +174,51 @@ function initializePlayerPositions() {
  * 컨트롤 패널 초기화
  */
 function initializeControlPanel() {
-  // ICM 정보 패널
+  // 시나리오 설명 패널
   const icmPanel = document.getElementById('icm-panel');
+
+  // 시나리오 정보 카드
+  const scenarioCard = Card.create({
+    title: '시나리오',
+    className: 'scenario-info-card',
+  });
+
+  scenarioCard.innerHTML = `
+    <div class="scenario-content" id="scenario-content">
+      <div class="scenario-header">
+        <h4 id="scenario-title">시나리오 로딩 중...</h4>
+        <div class="scenario-meta">
+          <span class="difficulty-badge" id="scenario-difficulty">-</span>
+          <span class="scenario-number" id="scenario-number">-/-</span>
+        </div>
+      </div>
+      <div class="scenario-description">
+        <p id="scenario-description">시나리오 설명이 여기에 표시됩니다.</p>
+      </div>
+      <div class="scenario-situation">
+        <div class="situation-item">
+          <span class="situation-label">포지션:</span>
+          <span class="situation-value" id="scenario-position">-</span>
+        </div>
+        <div class="situation-item">
+          <span class="situation-label">핸드:</span>
+          <span class="situation-value" id="scenario-hand">--</span>
+        </div>
+        <div class="situation-item">
+          <span class="situation-label">스택:</span>
+          <span class="situation-value" id="scenario-stack">- BB</span>
+        </div>
+        <div class="situation-item">
+          <span class="situation-label">액션:</span>
+          <span class="situation-value" id="scenario-action">-</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  icmPanel.appendChild(scenarioCard);
+
+  // ICM 정보 패널
   const icmCard = Card.create({
     title: 'ICM Equity',
     className: 'icm-info-card',
@@ -228,61 +271,60 @@ function initializeControlPanel() {
   const actionsDiv = document.createElement('div');
   actionsDiv.className = 'action-buttons';
 
-  // 액션 버튼들
+  // 퀴즈 액션 버튼들 (Push/Fold만)
   const foldBtn = Button.create({
     text: 'FOLD',
     variant: 'danger',
     size: 'lg',
-    onClick: () => handleAction('fold'),
+    className: 'quiz-action-btn fold-btn',
   });
 
-  const callBtn = Button.create({
-    text: 'CALL',
-    variant: 'secondary',
-    size: 'lg',
-    onClick: () => handleAction('call'),
-  });
-
-  const raiseBtn = Button.create({
-    text: 'RAISE',
+  const pushBtn = Button.create({
+    text: 'PUSH',
     variant: 'primary',
     size: 'lg',
-    onClick: () => handleAction('raise'),
+    className: 'quiz-action-btn push-btn',
   });
 
-  const allInBtn = Button.create({
-    text: 'ALL IN',
-    variant: 'primary',
-    size: 'lg',
-    className: 'all-in-button',
-    onClick: () => handleAction('all-in'),
-  });
+  // 이벤트 리스너 직접 추가
+  foldBtn.addEventListener('click', () => handleQuizAction('fold'));
+  pushBtn.addEventListener('click', () => handleQuizAction('push'));
 
   actionsDiv.appendChild(foldBtn);
-  actionsDiv.appendChild(callBtn);
-  actionsDiv.appendChild(raiseBtn);
-  actionsDiv.appendChild(allInBtn);
+  actionsDiv.appendChild(pushBtn);
 
   controlCard.appendChild(actionsDiv);
 
-  // Push/Fold 추천 섹션
-  const recommendationDiv = document.createElement('div');
-  recommendationDiv.className = 'push-fold-recommendation';
-  recommendationDiv.innerHTML = `
-    <h4>Push/Fold 추천</h4>
-    <div class="recommendation-content">
-      <div class="recommendation-result">
-        <span class="recommendation-label">추천 액션:</span>
-        <span class="recommendation-value push">PUSH</span>
-      </div>
-      <div class="hand-range">
-        <span class="range-label">Push 범위:</span>
-        <span class="range-value">22+, A2s+, A5o+, K9s+, KTo+</span>
-      </div>
-    </div>
-  `;
+  // 퀴즈 컨트롤 버튼들
+  const quizControlDiv = document.createElement('div');
+  quizControlDiv.className = 'quiz-control-buttons';
 
-  controlCard.appendChild(recommendationDiv);
+  // 정답 확인 버튼
+  const checkAnswerBtn = Button.create({
+    text: '정답 확인',
+    variant: 'primary',
+    size: 'lg',
+    className: 'quiz-control-btn disabled',
+    disabled: true,
+  });
+  checkAnswerBtn.id = 'check-answer-btn';
+  checkAnswerBtn.addEventListener('click', () => handleCheckAnswer());
+
+  // 새 시나리오 버튼
+  const newScenarioBtn = Button.create({
+    text: '새 시나리오',
+    variant: 'secondary',
+    size: 'lg',
+    className: 'quiz-control-btn disabled',
+    disabled: true,
+  });
+  newScenarioBtn.id = 'new-scenario-btn';
+  newScenarioBtn.addEventListener('click', () => handleNewScenario());
+
+  quizControlDiv.appendChild(checkAnswerBtn);
+  quizControlDiv.appendChild(newScenarioBtn);
+
+  controlCard.appendChild(quizControlDiv);
   actionControls.appendChild(controlCard);
 }
 
@@ -306,14 +348,9 @@ function setupEventListeners() {
     }
   });
 
-  // 플레이어 카드 클릭 이벤트 (데모용)
+  // 플레이어 카드 클릭 이벤트 (퀴즈 모드용)
   document.querySelectorAll('.player-card').forEach((card, index) => {
     card.addEventListener('click', (e) => {
-      // 칩 영역 클릭이면 편집 모드로 전환하지 않음
-      if (e.target.closest('.player-chips')) {
-        return;
-      }
-
       // 클릭한 플레이어를 액티브로 설정
       document.querySelectorAll('.player-card').forEach((c) => c.classList.remove('active'));
       card.classList.add('active');
@@ -324,54 +361,502 @@ function setupEventListeners() {
     });
   });
 
-  // 칩 편집 이벤트 설정
-  setupChipEditingEvents();
+  // 칩 편집 기능 제거됨 (퀴즈 모드에서는 스택이 고정)
 }
 
 /**
- * 액션 처리
- * @param {string} action - 액션 타입
+ * 퀴즈 액션 처리
+ * @param {string} action - 액션 타입 ('push' 또는 'fold')
  */
-function handleAction(action) {
+function handleQuizAction(action) {
   if (config.debug) {
-    console.info(`Action: ${action}`);
+    console.info(`Quiz Action: ${action}`);
   }
-  // TODO: 액션 처리 로직 구현
+
+  // 액션 버튼 상태 업데이트
+  document.querySelectorAll('.quiz-action-btn').forEach((btn) => {
+    btn.classList.remove('selected');
+  });
+
+  const selectedBtn = document.querySelector(`.${action}-btn`);
+  if (selectedBtn) {
+    selectedBtn.classList.add('selected');
+  }
+
+  // 정답 확인 버튼 활성화
+  const checkAnswerBtn = document.getElementById('check-answer-btn');
+  if (checkAnswerBtn) {
+    checkAnswerBtn.disabled = false;
+    checkAnswerBtn.classList.remove('disabled');
+  }
+
+  // 현재 선택된 액션 저장
+  window.currentQuizAction = action;
+
+  if (config.debug) {
+    console.info(`Quiz action selected: ${action}`);
+  }
 }
 
 /**
- * 딜러 버튼 위치 업데이트
- * @param {number} playerIndex - 딜러 플레이어 인덱스
+ * 정답 확인 처리
  */
-function updateDealerButton(playerIndex) {
-  const dealerButton = document.getElementById('dealer-button');
-  // const positions = Object.values(POSITIONS); // Currently unused
+function handleCheckAnswer() {
+  const userAnswer = window.currentQuizAction;
 
-  if (!dealerButton) {
+  if (!userAnswer) {
+    console.warn('No action selected');
     return;
   }
 
-  // 플레이어 인덱스 저장
-  dealerButton.dataset.playerIndex = playerIndex;
+  try {
+    // 퀴즈 답안 평가
+    const result = evaluateQuizAnswer(userAnswer);
 
-  // 딜러 버튼 애니메이션 추가
-  dealerButton.classList.add('moving');
+    if (result.error) {
+      console.error('Quiz evaluation error:', result.error);
+      return;
+    }
+
+    // EV 차이 계산
+    const evDifference = calculateEVDifference(userAnswer);
+
+    // 통계 업데이트
+    const stats = updateQuizStats(result.isCorrect);
+
+    // 피드백 표시 (Toast)
+    showQuizFeedback(result, evDifference);
+
+    // 정답을 시각적으로 표시
+    showCorrectAnswer(result.correctAnswer, result.isCorrect);
+
+    // ICM EV 분석 표시
+    console.log('🎯 ICM EV 분석 표시 시작...');
+    console.log('📋 result.scenario:', result.scenario);
+    console.log('📊 ICM Analysis:', result.scenario?.icmAnalysis);
+    displayICMAnalysis(result.scenario.icmAnalysis, result.isCorrect, result.userAnswer);
+
+    // 정답 확인 버튼 비활성화
+    const checkAnswerBtn = document.getElementById('check-answer-btn');
+    if (checkAnswerBtn) {
+      checkAnswerBtn.disabled = true;
+      checkAnswerBtn.classList.add('disabled');
+    }
+
+    // 새 시나리오 버튼 활성화
+    const newScenarioBtn = document.getElementById('new-scenario-btn');
+    if (newScenarioBtn) {
+      newScenarioBtn.disabled = false;
+      newScenarioBtn.classList.remove('disabled');
+    }
+
+    if (config.debug) {
+      console.info('Quiz result:', result);
+      console.info('EV difference:', evDifference);
+      console.info('Updated stats:', stats);
+    }
+  } catch (error) {
+    console.error('Error checking answer:', error);
+  }
+}
+
+/**
+ * 퀴즈 피드백 표시
+ */
+function showQuizFeedback(result, evDifference) {
+  // 즉시 피드백 (Toast)
+  const evSign = evDifference > 0 ? '+' : '';
+  const evText = `${evSign}${evDifference.toFixed(1)}% EV`;
+
+  if (result.isCorrect) {
+    Toast.success(`정답! ${result.explanation.short} (${evText})`);
+  } else {
+    Toast.error(`틀렸습니다. 정답은 ${result.correctAnswer.toUpperCase()}입니다. (${evText} 손실)`);
+  }
+
+  // 상세 해설 버튼 추가
   setTimeout(() => {
-    dealerButton.classList.remove('moving');
-  }, 1000);
+    showDetailedExplanation(result, evDifference);
+  }, 2000);
+}
 
-  // 원형 테이블에서의 위치 계산 (플레이어 카드 근처)
-  const angle = (playerIndex * 60 - 90) * (Math.PI / 180);
-  // 반응형 반지름 계산
-  const baseRadius = UI_CONSTANTS.TABLE_RADIUS;
-  const containerSize = Math.min(window.innerWidth * 0.4, window.innerHeight * 0.6, 700);
-  const responsiveRadius = Math.min(baseRadius, containerSize * 0.35);
-  const radius = responsiveRadius - 50; // 플레이어 카드보다 안쪽
-  const x = Math.cos(angle) * radius;
-  const y = Math.sin(angle) * radius;
+/**
+ * 상세 해설 모달 표시
+ */
+function showDetailedExplanation(result, evDifference) {
+  const { scenario, explanation, icmAnalysis, handRange } = result;
 
-  dealerButton.style.left = `calc(50% + ${x}px - 24px)`;
-  dealerButton.style.top = `calc(50% + ${y}px - 24px)`;
+  // 해설 콘텐츠 생성
+  const explanationContent = `
+    <div class="quiz-explanation">
+      <div class="explanation-header">
+        <h3>${scenario.title}</h3>
+        <div class="result-badge ${result.isCorrect ? 'correct' : 'incorrect'}">
+          ${result.isCorrect ? '정답' : '오답'}: ${result.correctAnswer.toUpperCase()}
+        </div>
+      </div>
+      
+      <div class="explanation-content">
+        <div class="explanation-section">
+          <h4>상황 분석</h4>
+          <p>${explanation.detailed}</p>
+        </div>
+        
+        <div class="explanation-section">
+          <h4>ICM 분석</h4>
+          <div class="icm-comparison">
+            <div class="ev-comparison">
+              <div class="ev-item">
+                <span class="ev-label">PUSH EV:</span>
+                <span class="ev-value">${icmAnalysis.pushEV.toFixed(1)}%</span>
+              </div>
+              <div class="ev-item">
+                <span class="ev-label">FOLD EV:</span>
+                <span class="ev-value">${icmAnalysis.foldEV.toFixed(1)}%</span>
+              </div>
+              <div class="ev-item ev-difference">
+                <span class="ev-label">차이:</span>
+                <span class="ev-value ${icmAnalysis.difference > 0 ? 'positive' : 'negative'}">
+                  ${icmAnalysis.difference > 0 ? '+' : ''}${icmAnalysis.difference.toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="explanation-section">
+          <h4>핸드 범위</h4>
+          <div class="hand-ranges">
+            <div class="range-item">
+              <span class="range-label">Push 범위:</span>
+              <span class="range-value">${handRange.pushRange}</span>
+            </div>
+            <div class="range-item">
+              <span class="range-label">Fold 범위:</span>
+              <span class="range-value">${handRange.foldRange}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="explanation-section">
+          <h4>현재 상황</h4>
+          <div class="situation-summary">
+            <p><strong>포지션:</strong> ${scenario.situation.heroPosition}</p>
+            <p><strong>핸드:</strong> ${scenario.situation.heroCards}</p>
+            <p><strong>스택 크기:</strong> ${scenario.situation.stacks.HERO} (${(scenario.situation.stacks.HERO / scenario.situation.blindLevel.big).toFixed(1)} BB)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 모달 생성 및 표시
+  const explanationModal = Modal.create({
+    title: '상세 해설',
+    content: explanationContent,
+    size: 'large',
+    footer: [
+      {
+        text: '다음 시나리오',
+        variant: 'primary',
+        onClick: (e, modal) => {
+          modal.close();
+          handleNewScenario();
+        },
+      },
+      {
+        text: '닫기',
+        variant: 'secondary',
+        onClick: (e, modal) => modal.close(),
+      },
+    ],
+  });
+
+  explanationModal.open();
+}
+
+/**
+ * 정답을 시각적으로 표시
+ */
+function showCorrectAnswer(correctAnswer, isCorrect) {
+  console.log('🎯 showCorrectAnswer called:', {
+    correctAnswer,
+    isCorrect,
+    currentAction: window.currentQuizAction,
+  });
+
+  // 모든 액션 버튼의 정답 표시 상태 제거
+  document.querySelectorAll('.quiz-action-btn').forEach((btn) => {
+    btn.classList.remove('correct-answer', 'wrong-answer');
+    console.log('🧹 Removed answer classes from button:', btn.className);
+  });
+
+  // 정답 버튼에 정답 표시
+  const correctBtn = document.querySelector(`.${correctAnswer.toLowerCase()}-btn`);
+  console.log(
+    '✅ Correct button found:',
+    correctBtn,
+    'selector:',
+    `.${correctAnswer.toLowerCase()}-btn`,
+  );
+
+  if (correctBtn) {
+    correctBtn.classList.add('correct-answer');
+    console.log('✅ Added correct-answer class. Button classes now:', correctBtn.className);
+
+    // 정답 아이콘 추가
+    const existingIcon = correctBtn.querySelector('.answer-icon');
+    if (!existingIcon) {
+      const answerIcon = document.createElement('span');
+      answerIcon.className = 'answer-icon correct-icon';
+      answerIcon.innerHTML = '✓';
+      correctBtn.appendChild(answerIcon);
+      console.log('✅ Added correct icon to button');
+    }
+  }
+
+  // 사용자가 선택한 답이 틀렸다면 틀린 답도 표시
+  if (!isCorrect && window.currentQuizAction) {
+    const userBtn = document.querySelector(`.${window.currentQuizAction.toLowerCase()}-btn`);
+    console.log(
+      '❌ User button found:',
+      userBtn,
+      'selector:',
+      `.${window.currentQuizAction.toLowerCase()}-btn`,
+    );
+
+    if (userBtn && userBtn !== correctBtn) {
+      userBtn.classList.add('wrong-answer');
+      console.log('❌ Added wrong-answer class. Button classes now:', userBtn.className);
+
+      // 틀린 답 아이콘 추가
+      const existingIcon = userBtn.querySelector('.answer-icon');
+      if (!existingIcon) {
+        const answerIcon = document.createElement('span');
+        answerIcon.className = 'answer-icon wrong-icon';
+        answerIcon.innerHTML = '✗';
+        userBtn.appendChild(answerIcon);
+        console.log('❌ Added wrong icon to button');
+      }
+    }
+  }
+
+  // 3초 후 상세 해설 표시 (기존 로직 조정)
+  if (config.debug) {
+    console.info(
+      `Correct answer displayed: ${correctAnswer}, user was ${isCorrect ? 'correct' : 'wrong'}`,
+    );
+  }
+}
+
+/**
+ * ICM EV 분석 표시
+ */
+function displayICMAnalysis(icmAnalysis, isCorrect, userAnswer) {
+  console.log('🚀 displayICMAnalysis 함수 호출됨!');
+  console.log('📊 파라미터:', { icmAnalysis, isCorrect, userAnswer });
+
+  if (!icmAnalysis) {
+    console.log('❌ ICM 분석 데이터가 없습니다:', icmAnalysis);
+    return;
+  }
+
+  console.log('✅ ICM 분석 데이터 있음, 계속 진행...');
+
+  // ICM 분석 패널 찾기 또는 생성
+  let icmPanel = document.querySelector('.icm-analysis-panel');
+  if (!icmPanel) {
+    icmPanel = document.createElement('div');
+    icmPanel.className = 'icm-analysis-panel';
+
+    // 컨트롤 섹션에 안전하게 추가
+    const controlSection = document.querySelector('.control-section');
+
+    if (controlSection) {
+      // 컨트롤 섹션의 맨 앞에 추가
+      controlSection.insertBefore(icmPanel, controlSection.firstChild);
+      console.log('✅ ICM 패널이 컨트롤 섹션 맨 앞에 추가됨');
+    } else {
+      // 대안: 게임 컨테이너에 추가
+      const gameContainer = document.querySelector('.game-container');
+      if (gameContainer) {
+        gameContainer.appendChild(icmPanel);
+        console.log('⚠️ ICM 패널을 게임 컨테이너에 추가함');
+      } else {
+        // 최후 수단: body에 추가
+        document.body.appendChild(icmPanel);
+        console.log('⚠️ ICM 패널을 body에 추가함');
+      }
+    }
+  }
+
+  // Push EV와 Fold EV 정보
+  const { pushEV } = icmAnalysis;
+  const { foldEV } = icmAnalysis;
+  const { difference } = icmAnalysis;
+  const isPositive = difference > 0;
+
+  // 사용자가 선택한 옵션의 EV
+  const userEV = userAnswer.toLowerCase() === 'push' ? pushEV : foldEV;
+  const correctEV = userAnswer.toLowerCase() === 'push' ? foldEV : pushEV;
+
+  // EV 차이 색상
+  const evColor = isPositive ? '#10b981' : '#ef4444';
+  const userChoiceColor = isCorrect ? '#10b981' : '#ef4444';
+
+  icmPanel.innerHTML = `
+    <div class="card icm-analysis-card">
+      <div class="card-content">
+        <h4>📊 ICM EV 분석</h4>
+        
+        <div class="ev-comparison">
+          <div class="ev-option ${userAnswer.toLowerCase() === 'push' ? 'user-choice' : ''}">
+            <div class="ev-label">
+              <span class="action-text">PUSH</span>
+              ${userAnswer.toLowerCase() === 'push' ? '<span class="choice-indicator">← 당신의 선택</span>' : ''}
+            </div>
+            <div class="ev-value" style="color: ${userAnswer.toLowerCase() === 'push' ? userChoiceColor : '#6b7280'}">
+              ${pushEV.toFixed(1)}
+            </div>
+          </div>
+          
+          <div class="vs-divider">VS</div>
+          
+          <div class="ev-option ${userAnswer.toLowerCase() === 'fold' ? 'user-choice' : ''}">
+            <div class="ev-label">
+              <span class="action-text">FOLD</span>
+              ${userAnswer.toLowerCase() === 'fold' ? '<span class="choice-indicator">← 당신의 선택</span>' : ''}
+            </div>
+            <div class="ev-value" style="color: ${userAnswer.toLowerCase() === 'fold' ? userChoiceColor : '#6b7280'}">
+              ${foldEV.toFixed(1)}
+            </div>
+          </div>
+        </div>
+        
+        <div class="ev-difference">
+          <div class="difference-label">EV 차이</div>
+          <div class="difference-value" style="color: ${evColor}">
+            ${isPositive ? '+' : ''}${Math.abs(difference).toFixed(1)}
+            <span class="difference-explanation">
+              ${isCorrect ? '✅ 올바른 결정!' : '❌ 잘못된 결정'}
+            </span>
+          </div>
+        </div>
+        
+        <div class="ev-explanation">
+          <p class="explanation-text">
+            ${
+              isCorrect
+                ? `훌륭합니다! 최적의 선택으로 <strong>+${Math.abs(difference).toFixed(1)}EV</strong>를 얻었습니다.`
+                : `아쉽습니다. 더 나은 선택이 있었습니다. <strong>-${Math.abs(difference).toFixed(1)}EV</strong> 손실입니다.`
+            }
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 애니메이션 효과
+  icmPanel.style.opacity = '0';
+  icmPanel.style.transform = 'translateY(20px)';
+
+  requestAnimationFrame(() => {
+    icmPanel.style.transition = 'all 0.5s ease-out';
+    icmPanel.style.opacity = '1';
+    icmPanel.style.transform = 'translateY(0)';
+  });
+
+  if (config.debug) {
+    console.info('ICM analysis displayed:', { pushEV, foldEV, difference, isCorrect });
+  }
+}
+
+/**
+ * 새 시나리오 로딩
+ */
+function handleNewScenario() {
+  try {
+    // 다음 시나리오 선택
+    const nextScenario = selectNextScenario();
+
+    if (nextScenario) {
+      // 테이블에 적용
+      applyScenarioToTable(nextScenario);
+
+      // UI 상태 초기화
+      resetQuizUI();
+
+      Toast.info(`새 시나리오: ${nextScenario.title}`);
+
+      if (config.debug) {
+        console.info('New scenario loaded:', nextScenario.title);
+      }
+    } else {
+      Toast.error('시나리오를 로딩할 수 없습니다.');
+    }
+  } catch (error) {
+    console.error('Error loading new scenario:', error);
+    Toast.error('새 시나리오 로딩 중 오류가 발생했습니다.');
+  }
+}
+
+/**
+ * 퀴즈 UI 상태 초기화
+ */
+function resetQuizUI() {
+  // 액션 버튼 선택 해제 및 정답 표시 제거
+  document.querySelectorAll('.quiz-action-btn').forEach((btn) => {
+    btn.classList.remove('selected', 'correct-answer', 'wrong-answer');
+
+    // 정답/틀린답 아이콘 제거
+    const answerIcon = btn.querySelector('.answer-icon');
+    if (answerIcon) {
+      answerIcon.remove();
+    }
+  });
+
+  // 정답 확인 버튼 비활성화
+  const checkAnswerBtn = document.getElementById('check-answer-btn');
+  if (checkAnswerBtn) {
+    checkAnswerBtn.disabled = true;
+    checkAnswerBtn.classList.add('disabled');
+  }
+
+  // 새 시나리오 버튼 비활성화
+  const newScenarioBtn = document.getElementById('new-scenario-btn');
+  if (newScenarioBtn) {
+    newScenarioBtn.disabled = true;
+    newScenarioBtn.classList.add('disabled');
+  }
+
+  // ICM 분석 패널 제거
+  const icmPanel = document.querySelector('.icm-analysis-panel');
+  if (icmPanel) {
+    icmPanel.remove();
+  }
+
+  // 현재 선택된 액션 초기화
+  window.currentQuizAction = null;
+}
+
+/**
+ * 수트 심볼 반환 (유틸리티 함수)
+ */
+function getSuitSymbol(suit) {
+  const symbols = {
+    h: '♥',
+    d: '♦',
+    c: '♣',
+    s: '♠',
+  };
+  return symbols[suit] || suit;
+}
+
+/**
+ * 딜러 버튼 기능 제거됨 - 퀴즈 모드에서는 필요 없음
+ */
+function updateDealerButton(playerIndex) {
+  // 딜러 버튼 기능이 제거되었습니다
 }
 
 /**
@@ -409,127 +894,29 @@ function updatePlayerChips(playerIndex, chips, bigBlind = null) {
   // 빅 블라인드가 제공되지 않으면 전역 값 사용
   const useBigBlind = bigBlind !== null ? bigBlind : currentBigBlind;
 
-  const chipCount = playerCard.querySelector('.chip-count');
-  const chipBB = playerCard.querySelector('.chip-bb');
+  const chipCountSub = playerCard.querySelector('.chip-count-sub');
+  const chipBBMain = playerCard.querySelector('.chip-bb-main');
 
-  if (chipCount) {
-    chipCount.textContent = chips.toLocaleString();
+  if (chipCountSub) {
+    chipCountSub.textContent = chips.toLocaleString();
   }
 
-  if (chipBB) {
+  if (chipBBMain) {
     const bbAmount = (chips / useBigBlind).toFixed(1);
-    chipBB.textContent = `${bbAmount} BB`;
+    chipBBMain.textContent = `${bbAmount} BB`;
   }
 
   // 플레이어 카드에 현재 칩 수 저장
   playerCard.dataset.chips = chips;
 }
 
-/**
- * 칩 편집 이벤트 설정
- */
-function setupChipEditingEvents() {
-  document.querySelectorAll('.player-chips').forEach((chipElement) => {
-    const chipCount = chipElement.querySelector('.chip-count');
+// 칩 편집 기능 제거됨 - 퀴즈 모드에서는 시나리오별 고정 스택 사용
 
-    // 더블클릭으로 편집 모드 진입
-    chipElement.addEventListener('dblclick', (e) => {
-      e.stopPropagation();
-      enableChipEditing(chipCount);
-    });
+// enableChipEditing 함수 제거됨 - 퀴즈 모드에서는 편집 불가
 
-    // 칩 수량 클릭
-    chipCount.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-  });
-}
+// saveChipValue 함수 제거됨 - 퀴즈 모드에서는 시나리오별 고정값 사용
 
-/**
- * 칩 편집 모드 활성화
- * @param {HTMLElement} chipCountElement - 칩 수량 요소
- */
-function enableChipEditing(chipCountElement) {
-  const currentValue = chipCountElement.textContent.replace(/,/g, '');
-  const { playerIndex } = chipCountElement.closest('.player-chips').dataset;
-
-  // 편집 모드로 전환
-  chipCountElement.contentEditable = 'true';
-  chipCountElement.classList.add('editing');
-  chipCountElement.textContent = currentValue;
-
-  // 텍스트 선택
-  chipCountElement.focus();
-  chipCountElement.select();
-
-  // Enter 키로 저장
-  chipCountElement.addEventListener('keydown', function onKeyDown(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      saveChipValue(chipCountElement, playerIndex);
-      chipCountElement.removeEventListener('keydown', onKeyDown);
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      cancelChipEditing(chipCountElement);
-      chipCountElement.removeEventListener('keydown', onKeyDown);
-    }
-  });
-
-  // 포커스 잃으면 저장
-  chipCountElement.addEventListener('blur', function onBlur() {
-    saveChipValue(chipCountElement, playerIndex);
-    chipCountElement.removeEventListener('blur', onBlur);
-  });
-
-  // 숫자만 입력 허용
-  chipCountElement.addEventListener('input', (e) => {
-    const value = e.target.textContent.replace(/[^0-9]/g, '');
-    if (value !== e.target.textContent) {
-      e.target.textContent = value;
-      // 커서를 끝으로 이동
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.selectNodeContents(e.target);
-      range.collapse(false);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  });
-}
-
-/**
- * 칩 값 저장
- * @param {HTMLElement} chipCountElement - 칩 수량 요소
- * @param {number} playerIndex - 플레이어 인덱스
- */
-function saveChipValue(chipCountElement, playerIndex) {
-  const newValue = parseInt(chipCountElement.textContent.replace(/[^0-9]/g, ''), 10) || 0;
-
-  // 편집 모드 해제
-  chipCountElement.contentEditable = 'false';
-  chipCountElement.classList.remove('editing');
-
-  // 값 업데이트
-  updatePlayerChips(playerIndex, newValue);
-
-  if (config.debug) {
-    console.info(`Player ${parseInt(playerIndex, 10) + 1} chips updated to ${newValue}`);
-  }
-}
-
-/**
- * 칩 편집 취소
- * @param {HTMLElement} chipCountElement - 칩 수량 요소
- */
-function cancelChipEditing(chipCountElement) {
-  const { playerIndex } = chipCountElement.closest('.player-chips').dataset;
-  const playerCard = document.querySelector(`[data-player-index="${playerIndex}"]`);
-  const currentChips = playerCard.dataset.chips || '1500';
-
-  chipCountElement.contentEditable = 'false';
-  chipCountElement.classList.remove('editing');
-  chipCountElement.textContent = parseInt(currentChips, 10).toLocaleString();
-}
+// cancelChipEditing 함수 제거됨 - 퀴즈 모드에서는 편집 취소 불필요
 
 /**
  * 게임 상태 초기화
@@ -544,9 +931,7 @@ function initializeGameState() {
     updatePlayerChips(index, chips);
   });
 
-  // 딜러 버튼을 랜덤 위치에 설정
-  const randomDealer = Math.floor(Math.random() * 6);
-  updateDealerButton(randomDealer);
+  // 딜러 버튼 제거됨
 }
 
 /**
@@ -565,8 +950,7 @@ function demoGameAnimation() {
 
     // 가끔 딜러 버튼 이동
     if (Math.random() < 0.2) {
-      const newDealer = Math.floor(Math.random() * 6);
-      updateDealerButton(newDealer);
+      // 딜러 버튼 제거됨
     }
   }, 3000);
 }
@@ -583,8 +967,8 @@ function updateBigBlind(newBigBlind) {
 
   // 모든 플레이어의 BB 표시 업데이트
   document.querySelectorAll('.player-chips').forEach((chipElement, index) => {
-    const chipCount = chipElement.querySelector('.chip-count');
-    const chips = parseInt(chipCount.textContent.replace(/,/g, ''), 10) || 0;
+    const chipCountSub = chipElement.querySelector('.chip-count-sub');
+    const chips = parseInt(chipCountSub.textContent.replace(/,/g, ''), 10) || 0;
     updatePlayerChips(index, chips, currentBigBlind);
   });
 
@@ -633,12 +1017,7 @@ function updatePlayerPositionsOnResize() {
     }
   });
 
-  // 딜러 버튼 위치도 업데이트
-  const dealerButton = document.getElementById('dealer-button');
-  if (dealerButton && dealerButton.dataset.playerIndex) {
-    const dealerIndex = parseInt(dealerButton.dataset.playerIndex, 10);
-    updateDealerButton(dealerIndex);
-  }
+  // 딜러 버튼 제거됨
 }
 
 /**
@@ -667,6 +1046,21 @@ window.updateBigBlind = updateBigBlind;
 window.getCurrentBigBlind = getCurrentBigBlind;
 window.setAllPlayerChips = setAllPlayerChips;
 window.demoGameAnimation = demoGameAnimation;
+window.handleCheckAnswer = handleCheckAnswer;
+window.handleNewScenario = handleNewScenario;
+window.handleQuizAction = handleQuizAction;
+window.displayICMAnalysis = displayICMAnalysis;
+
+// 디버깅용 테스트 함수
+window.testICMDisplay = function () {
+  console.log('🧪 ICM 표시 테스트 실행...');
+  const mockData = {
+    pushEV: 156.2,
+    foldEV: 148.7,
+    difference: 7.5,
+  };
+  displayICMAnalysis(mockData, true, 'push');
+};
 
 export default {
   initializeGameLayout,

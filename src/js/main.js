@@ -14,6 +14,9 @@ import { TRUSTED_TYPES_CONFIG } from '../config/security.js';
 // UI 컴포넌트 임포트
 import { initializeGameLayout } from './ui/views/gameLayout.js';
 
+// 시나리오 시스템 임포트
+import { initializeScenarios } from './scenario.js';
+
 // 보안 초기화
 function initializeSecurity() {
   try {
@@ -73,6 +76,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 게임 레이아웃 초기화
   initializeGameLayout();
+
+  // 시나리오 시스템 초기화 (비동기)
+  initializeScenarios().then((success) => {
+    if (success) {
+      console.info('퀴즈 시나리오 시스템 준비 완료');
+    } else {
+      console.warn('시나리오 시스템 초기화 실패 - 기본 모드로 실행');
+    }
+  });
 });
 
 // HMR (Hot Module Replacement) 지원

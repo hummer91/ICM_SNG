@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ICM EV 디버그 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-box { background: #f0f0f0; padding: 20px; margin: 10px 0; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .push-btn { background: #007bff; color: white; border: none; border-radius: 5px; }
+        .fold-btn { background: #dc3545; color: white; border: none; border-radius: 5px; }
+        .quiz-action-btn { border: 2px solid #ccc; }
+        .selected { border-color: #8b5cf6 !important; background: rgba(139, 92, 246, 0.1) !important; }
+        .correct-answer { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.2) !important; }
+    </style>
+</head>
+<body>
+    <h1>ICM EV 테스트</h1>
+    
+    <div class="debug-box">
+        <h3>1. 액션 버튼 테스트</h3>
+        <button class="quiz-action-btn push-btn" onclick="selectPush()">PUSH</button>
+        <button class="quiz-action-btn fold-btn" onclick="selectFold()">FOLD</button>
+        <button onclick="checkAnswer()">정답 확인</button>
+    </div>
+    
+    <div class="debug-box">
+        <h3>2. ICM 분석 패널 (여기에 나타날 예정)</h3>
+        <div id="icm-container"></div>
+    </div>
+    
+    <div class="debug-box">
+        <h3>3. 디버그 로그</h3>
+        <div id="debug-log"></div>
+    </div>
+
+    <script>
+        // 전역 변수
+        window.currentQuizAction = null;
+        
+        // Mock 시나리오 데이터
+        const mockScenario = {
+            icmAnalysis: {
+                pushEV: 156.2,
+                foldEV: 148.7,
+                difference: 7.5
+            },
+            correctAnswer: 'push'
+        };
+        
+        function log(message) {
+            const logDiv = document.getElementById('debug-log');
+            logDiv.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            console.log(message);
+        }
+        
+        function selectPush() {
+            log('Push 버튼 클릭됨');
+            window.currentQuizAction = 'push';
+            document.querySelector('.push-btn').classList.add('selected');
+            document.querySelector('.fold-btn').classList.remove('selected');
+        }
+        
+        function selectFold() {
+            log('Fold 버튼 클릭됨');
+            window.currentQuizAction = 'fold';
+            document.querySelector('.fold-btn').classList.add('selected');
+            document.querySelector('.push-btn').classList.remove('selected');
+        }
+        
+        function checkAnswer() {
+            log('정답 확인 버튼 클릭됨');
+            
+            if (!window.currentQuizAction) {
+                log('❌ 액션이 선택되지 않음');
+                return;
+            }
+            
+            const isCorrect = window.currentQuizAction === mockScenario.correctAnswer;
+            log(`선택: ${window.currentQuizAction}, 정답: ${mockScenario.correctAnswer}, 맞음: ${isCorrect}`);
+            
+            // 버튼 색상 변경
+            if (isCorrect) {
+                document.querySelector('.' + window.currentQuizAction + '-btn').classList.add('correct-answer');
+                log('✅ 정답 버튼에 correct-answer 클래스 추가됨');
+            }
+            
+            // ICM 분석 표시
+            try {
+                displayICMAnalysis(mockScenario.icmAnalysis, isCorrect, window.currentQuizAction);
+                log('✅ ICM 분석 함수 호출됨');
+            } catch (error) {
+                log('❌ ICM 분석 함수 에러: ' + error.message);
+            }
+        }
+        
+        // ICM 분석 표시 함수 (실제 코드와 동일)
+        function displayICMAnalysis(icmAnalysis, isCorrect, userAnswer) {
+            if (!icmAnalysis) {
+                log('❌ ICM 분석 데이터가 없음');
+                return;
+            }
+            
+            log('📊 ICM 분석 표시 시작: ' + JSON.stringify({icmAnalysis, isCorrect, userAnswer}));
+            
+            // ICM 분석 패널 찾기 또는 생성
+            let icmPanel = document.querySelector('.icm-analysis-panel');
+            if (!icmPanel) {
+                icmPanel = document.createElement('div');
+                icmPanel.className = 'icm-analysis-panel';
+                
+                const container = document.getElementById('icm-container');
+                if (container) {
+                    container.appendChild(icmPanel);
+                    log('✅ ICM 패널 생성됨');
+                } else {
+                    log('❌ ICM 컨테이너를 찾을 수 없음');
+                    return;
+                }
+            }
+            
+            // Push EV와 Fold EV 정보
+            const pushEV = icmAnalysis.pushEV;
+            const foldEV = icmAnalysis.foldEV;
+            const difference = icmAnalysis.difference;
+            const isPositive = difference > 0;
+            
+            log(`📈 Push EV: ${pushEV}, Fold EV: ${foldEV}, 차이: ${difference}`);
+            
+            // EV 차이 색상
+            const evColor = isPositive ? '#10b981' : '#ef4444';
+            const userChoiceColor = isCorrect ? '#10b981' : '#ef4444';
+            
+            icmPanel.innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h4>📊 ICM EV 분석</h4>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0; padding: 20px; background: white; border-radius: 8px;">
+                        <div style="text-align: center; padding: 15px; border-radius: 8px; background: ${userAnswer.toLowerCase() === 'push' ? '#e3f2fd' : '#f5f5f5'}; border: 2px solid ${userAnswer.toLowerCase() === 'push' ? '#2196f3' : '#ccc'};">
+                            <div style="font-weight: bold;">PUSH ${userAnswer.toLowerCase() === 'push' ? '← 당신의 선택' : ''}</div>
+                            <div style="font-size: 24px; font-weight: bold; color: ${userAnswer.toLowerCase() === 'push' ? userChoiceColor : '#666'};">
+                                ${pushEV.toFixed(1)}
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 20px; font-weight: bold; color: #666;">VS</div>
+                        
+                        <div style="text-align: center; padding: 15px; border-radius: 8px; background: ${userAnswer.toLowerCase() === 'fold' ? '#e3f2fd' : '#f5f5f5'}; border: 2px solid ${userAnswer.toLowerCase() === 'fold' ? '#2196f3' : '#ccc'};">
+                            <div style="font-weight: bold;">FOLD ${userAnswer.toLowerCase() === 'fold' ? '← 당신의 선택' : ''}</div>
+                            <div style="font-size: 24px; font-weight: bold; color: ${userAnswer.toLowerCase() === 'fold' ? userChoiceColor : '#666'};">
+                                ${foldEV.toFixed(1)}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px; background: white; border-radius: 8px; margin: 20px 0;">
+                        <div style="margin-bottom: 10px;">EV 차이</div>
+                        <div style="font-size: 32px; font-weight: bold; color: ${evColor};">
+                            ${isPositive ? '+' : ''}${Math.abs(difference).toFixed(1)}
+                            <div style="font-size: 16px; margin-top: 10px;">
+                                ${isCorrect ? '✅ 올바른 결정!' : '❌ 잘못된 결정'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+                        <p style="margin: 0;">
+                            ${isCorrect 
+                                ? `훌륭합니다! 최적의 선택으로 <strong>+${Math.abs(difference).toFixed(1)}EV</strong>를 얻었습니다.`
+                                : `아쉽습니다. 더 나은 선택이 있었습니다. <strong>-${Math.abs(difference).toFixed(1)}EV</strong> 손실입니다.`
+                            }
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            log('✅ ICM 패널 HTML 생성 완료');
+        }
+        
+        log('🎮 페이지 로드 완료 - 버튼을 클릭해서 테스트해보세요!');
+    </script>
+</body>
+</html>

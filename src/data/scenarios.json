@@ -1,0 +1,586 @@
+{
+  "version": "1.0",
+  "description": "6-Max SNG ICM 학습 시나리오 데이터",
+  "scenarios": [
+    {
+      "id": "scenario_001",
+      "title": "버블 상황 - BTN 스틸",
+      "description": "6명 남은 상황에서 3등까지 상금을 받습니다. 버블 상황에서의 적극적 플레이입니다.",
+      "difficulty": "beginner",
+      "tags": ["bubble", "steal", "BTN"],
+      "situation": {
+        "playersLeft": 6,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 25,
+          "big": 50,
+          "ante": 0
+        },
+        "heroPosition": "BTN",
+        "heroCards": "A5s",
+        "stacks": {
+          "UTG": 800,
+          "MP": 1200,
+          "CO": 1400,
+          "HERO": 1500,
+          "SB": 900,
+          "BB": 1000
+        },
+        "positions": ["UTG", "MP", "CO", "HERO(BTN)", "SB", "BB"],
+        "actions": [
+          { "position": "UTG", "action": "fold" },
+          { "position": "MP", "action": "fold" },
+          { "position": "CO", "action": "fold" }
+        ],
+        "actionToHero": "UTG folds, MP folds, CO folds",
+        "potSize": 75,
+        "dealerPosition": "HERO"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "A5s는 버블 상황 BTN에서 충분히 강한 푸시 핸드입니다.",
+        "detailed": "30BB 스택에서 A5s는 BTN 포지션에서 강력한 푸시 핸드입니다. 버블 상황에서 SB가 매우 타이트하게 콜할 것이므로, 이 핸드로 푸시하는 것이 +EV입니다. ICM 압박으로 인해 상대방이 더 타이트하게 플레이하므로 푸시 범위를 넓힐 수 있습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 156.2,
+        "foldEV": 148.7,
+        "difference": 7.5,
+        "equity": {
+          "UTG": 18.5,
+          "MP": 28.3,
+          "HERO": 33.8,
+          "SB": 19.4
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2s+, A5o+, K7s+, K9o+, Q9s+, QTo+, J9s+, JTo",
+        "foldRange": "기타 모든 핸드"
+      }
+    },
+    {
+      "id": "scenario_002", 
+      "title": "숏스택 SB 푸시",
+      "description": "매우 짧은 스택으로 생존을 위한 푸시 타이밍입니다.",
+      "difficulty": "beginner",
+      "tags": ["short-stack", "push-fold", "SB"],
+      "situation": {
+        "playersLeft": 6,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 50,
+          "big": 100,
+          "ante": 10
+        },
+        "heroPosition": "SB",
+        "heroCards": "KQo",
+        "stacks": {
+          "UTG": 1800,
+          "MP": 2200,
+          "CO": 1100, 
+          "BTN": 1000,
+          "HERO": 600,
+          "BB": 1300
+        },
+        "positions": ["UTG", "MP", "CO", "BTN", "HERO(SB)", "BB"],
+        "actions": [
+          { "position": "UTG", "action": "fold" },
+          { "position": "MP", "action": "fold" },
+          { "position": "CO", "action": "fold" },
+          { "position": "BTN", "action": "fold" }
+        ],
+        "actionToHero": "UTG folds, MP folds, CO folds, BTN folds",
+        "potSize": 200,
+        "dealerPosition": "BTN"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "6BB 스택에서 KQo는 확실한 푸시 핸드입니다.",
+        "detailed": "6BB 스택에서는 프리미엄 핸드를 기다릴 여유가 없습니다. KQo는 BB와 1:1 상황에서도 충분히 강한 핸드이며, 폴드 에퀴티도 고려하면 명확한 푸시 상황입니다. 안테까지 있는 상황에서 더욱 푸시가 유리합니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 89.4,
+        "foldEV": 82.1,
+        "difference": 7.3,
+        "equity": {
+          "UTG": 26.8,
+          "MP": 32.1,
+          "CO": 16.4,
+          "BTN": 0,
+          "HERO": 8.9,
+          "BB": 15.8
+        }
+      },
+      "handRange": {
+        "pushRange": "88+, A2s+, A7o+, K9s+, KTo+, Q9s+, QTo+, J9s+, JTo, T9s",
+        "foldRange": "더 약한 핸드들"
+      }
+    },
+    {
+      "id": "scenario_003",
+      "title": "미들스택 MP 경계선",
+      "description": "애매한 핸드로 미들스택에서의 어려운 결정입니다.",
+      "difficulty": "intermediate", 
+      "tags": ["middle-stack", "marginal", "MP"],
+      "situation": {
+        "playersLeft": 6,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 25,
+          "big": 50,
+          "ante": 0
+        },
+        "heroPosition": "MP",
+        "heroCards": "99",
+        "stacks": {
+          "UTG": 900,
+          "HERO": 1100,
+          "CO": 1400,
+          "BTN": 1600,
+          "SB": 800,
+          "BB": 1200
+        },
+        "positions": ["UTG", "HERO(MP)", "CO", "BTN", "SB", "BB"],
+        "actions": [
+          { "position": "UTG", "action": "fold" }
+        ],
+        "actionToHero": "UTG folds",
+        "potSize": 75,
+        "dealerPosition": "BB"
+      },
+      "correctAnswer": "fold",
+      "explanation": {
+        "short": "99는 강한 핸드이지만 22BB 스택에서 MP 포지션은 너무 이릅니다.",
+        "detailed": "99는 절대적으로는 강한 핸드이지만, 22BB 스택에서 MP 포지션에서 푸시하기에는 너무 이릅니다. 뒤에 4명의 플레이어가 있고, 이들 중 누군가는 더 강한 핸드로 콜할 가능성이 높습니다. 더 좋은 포지션이나 더 짧은 스택을 기다리는 것이 유리합니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 163.2,
+        "foldEV": 168.8,
+        "difference": -5.6,
+        "equity": {
+          "UTG": 12.8,
+          "HERO": 15.7,
+          "CO": 20.1,
+          "BTN": 22.9,
+          "SB": 11.4,
+          "BB": 17.1
+        }
+      },
+      "handRange": {
+        "pushRange": "JJ+, AQs+, AKo (매우 타이트)",
+        "foldRange": "99, TT 포함 대부분의 핸드"
+      }
+    },
+    {
+      "id": "scenario_004",
+      "title": "빅스택 CO 어그레션",
+      "description": "큰 스택으로 숏스택들을 압박하는 상황입니다.",
+      "difficulty": "intermediate",
+      "tags": ["big-stack", "aggression", "CO"],
+      "situation": {
+        "playersLeft": 4,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 50,
+          "big": 100,
+          "ante": 10
+        },
+        "heroPosition": "CO",
+        "heroCards": "K7o",
+        "stacks": {
+          "MP": 600,
+          "HERO": 2800,
+          "BTN": 800,
+          "SB": 1800
+        },
+        "positions": ["MP", "HERO(CO)", "BTN", "SB"],
+        "actions": [
+          { "position": "MP", "action": "fold" }
+        ],
+        "actionToHero": "MP folds",
+        "potSize": 200,
+        "dealerPosition": "SB"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "빅스택으로 쇼트스택들을 압박하는 상황에서는 더 넓은 범위로 푸시할 수 있습니다.",
+        "detailed": "28BB의 큰 스택을 가지고 있고, 뒤에 있는 플레이어들(BTN 8BB, SB 18BB)이 상대적으로 작은 스택을 가지고 있습니다. 버블 상황에서 이들은 매우 타이트하게 콜할 것이므로, K7o 같은 약간 약한 핸드로도 푸시할 수 있습니다. ICM 압박을 이용한 전략적 푸시입니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 412.8,
+        "foldEV": 408.1,
+        "difference": 4.7,
+        "equity": {
+          "MP": 8.2,
+          "HERO": 41.3,
+          "BTN": 11.7,
+          "SB": 38.8
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2+, K2s+, K7o+, Q6s+, Q9o+, J8s+, JTo+, T8s+, T9o, 98s",
+        "foldRange": "더 약한 오프슈트 핸드들"
+      }
+    },
+    {
+      "id": "scenario_005",
+      "title": "헤즈업 SB 결정",
+      "description": "1:1 상황에서의 푸시/폴드 결정입니다.",
+      "difficulty": "beginner",
+      "tags": ["heads-up", "final-two", "SB"],
+      "situation": {
+        "playersLeft": 2,
+        "payoutPositions": 2,
+        "payoutStructure": [0.7, 0.3],
+        "blindLevel": {
+          "small": 100,
+          "big": 200,
+          "ante": 25
+        },
+        "heroPosition": "SB",
+        "heroCards": "85o",
+        "stacks": {
+          "HERO": 1800,
+          "BB": 3200
+        },
+        "positions": ["HERO(SB)", "BB"],
+        "actions": [],
+        "actionToHero": "First to act",
+        "potSize": 325,
+        "dealerPosition": "HERO"
+      },
+      "correctAnswer": "fold",
+      "explanation": {
+        "short": "85o는 헤즈업에서도 너무 약한 핸드입니다.",
+        "detailed": "헤즈업 상황에서는 일반적으로 넓은 범위로 푸시하지만, 85o는 여전히 너무 약합니다. 9BB 스택이지만 상대방이 콜링 스테이션이 아닌 이상, 더 나은 핸드를 기다리는 것이 좋습니다. 헤즈업에서도 최소한 A2+, K2+, Q7+, J8+ 정도는 되어야 푸시를 고려할 수 있습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 126.4,
+        "foldEV": 129.2,
+        "difference": -2.8,
+        "equity": {
+          "HERO": 36.0,
+          "BB": 64.0
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2+, K2+, Q7s+, Q9o+, J8s+, JTo+, T8s+, T9o, 98s",
+        "foldRange": "85o, 74o, 63o 등 매우 약한 핸드들"
+      }
+    },
+    {
+      "id": "scenario_006",
+      "title": "딥스택 UTG 초기",
+      "description": "토너먼트 초기에 깊은 스택으로 하는 신중한 플레이입니다.",
+      "difficulty": "advanced",
+      "tags": ["deep-stack", "early-stage", "UTG"],
+      "situation": {
+        "playersLeft": 6,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 10,
+          "big": 20,
+          "ante": 0
+        },
+        "heroPosition": "UTG",
+        "heroCards": "AJo",
+        "stacks": {
+          "HERO": 1480,
+          "MP": 1520,
+          "CO": 1465,
+          "BTN": 1535,
+          "SB": 1490,
+          "BB": 1510
+        },
+        "positions": ["HERO(UTG)", "MP", "CO", "BTN", "SB", "BB"],
+        "actions": [],
+        "actionToHero": "First to act",
+        "potSize": 30,
+        "dealerPosition": "SB"
+      },
+      "correctAnswer": "fold",
+      "explanation": {
+        "short": "초기 단계 74BB에서 UTG 포지션의 AJo는 푸시 핸드가 아닙니다.",
+        "detailed": "토너먼트 초기 단계에서 74BB 딥스택일 때는 푸시/폴드 전략을 사용하지 않습니다. AJo는 UTG에서 레이즈하기에도 약간 약한 핸드입니다. 딥스택에서는 포지션과 임플라이드 오즈가 중요하므로, 더 강한 핸드나 더 좋은 포지션을 기다려야 합니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 235.2,
+        "foldEV": 246.7,
+        "difference": -11.5,
+        "equity": {
+          "HERO": 16.6,
+          "MP": 16.7,
+          "CO": 16.5,
+          "BTN": 16.8,
+          "SB": 16.6,
+          "BB": 16.8
+        }
+      },
+      "handRange": {
+        "pushRange": "없음 (딥스택에서는 푸시/폴드 전략 사용 안 함)",
+        "foldRange": "대부분의 핸드 (표준 레이즈/콜 전략 사용)"
+      }
+    },
+    {
+      "id": "scenario_007",
+      "title": "콜링 스테이션 BTN 조정",
+      "description": "루즈한 상대방이 있을 때의 조정된 전략입니다.",
+      "difficulty": "advanced",
+      "tags": ["calling-station", "adjustment", "BTN"],
+      "situation": {
+        "playersLeft": 5,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 75,
+          "big": 150,
+          "ante": 15
+        },
+        "heroPosition": "BTN",
+        "heroCards": "A9o",
+        "stacks": {
+          "UTG": 1200,
+          "MP": 0,
+          "CO": 2100,
+          "HERO": 1500,
+          "SB": 800,
+          "BB": 1400
+        },
+        "positions": ["UTG", "MP", "CO", "HERO(BTN)", "SB", "BB"],
+        "actions": [
+          { "position": "UTG", "action": "fold" },
+          { "position": "CO", "action": "fold" }
+        ],
+        "actionToHero": "UTG folds, CO folds",
+        "potSize": 300,
+        "dealerPosition": "CO"
+      },
+      "correctAnswer": "fold",
+      "explanation": {
+        "short": "SB가 콜링 스테이션이라면 A9o로는 너무 위험합니다.",
+        "detailed": "10BB 스택에서 A9o는 일반적으로 BTN에서 푸시 핸드이지만, SB 플레이어가 콜링 스테이션(너무 넓게 콜하는 플레이어)이라면 상황이 달라집니다. 이런 상대에게는 더 강한 핸드만으로 푸시해야 합니다. A9o는 많은 Ax 핸드에 도미네이트되므로, AT+ 정도의 핸드를 기다리는 것이 좋습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 186.3,
+        "foldEV": 189.7,
+        "difference": -3.4,
+        "equity": {
+          "UTG": 17.8,
+          "CO": 31.2,
+          "HERO": 22.3,
+          "SB": 11.9,
+          "BB": 16.8
+        }
+      },
+      "handRange": {
+        "pushRange": "99+, ATs+, AJo+, KQs (콜링 스테이션 상대 조정 범위)",
+        "foldRange": "A9o, KJo, QJs 등 일반적 푸시 핸드들도 폴드"
+      }
+    },
+    {
+      "id": "scenario_008",
+      "title": "BTN 스틸 시도",
+      "description": "블라인드를 스틸하는 상황입니다.",
+      "difficulty": "beginner",
+      "tags": ["steal", "blind-steal", "BTN"],
+      "situation": {
+        "playersLeft": 6,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 30,
+          "big": 60,
+          "ante": 5
+        },
+        "heroPosition": "BTN",
+        "heroCards": "QTo",
+        "stacks": {
+          "UTG": 1100,
+          "MP": 950,
+          "CO": 1300,
+          "HERO": 850,
+          "SB": 1200,
+          "BB": 1600
+        },
+        "positions": ["UTG", "MP", "CO", "HERO(BTN)", "SB", "BB"],
+        "actions": [
+          { "position": "UTG", "action": "fold" },
+          { "position": "MP", "action": "fold" },
+          { "position": "CO", "action": "fold" }
+        ],
+        "actionToHero": "UTG folds, MP folds, CO folds",
+        "potSize": 120,
+        "dealerPosition": "CO"
+      },
+      "correctAnswer": "push",
+      "explanation": {
+        "short": "14BB 스택에서 BTN 포지션의 QTo는 좋은 스틸 핸드입니다.",
+        "detailed": "14BB 스택에서 BTN 포지션은 스틸하기에 완벽한 상황입니다. QTo는 SB와 BB 대부분의 핸드를 이기며, 안테가 있어서 팟 사이즈도 좋습니다. 포지션상 2명만 넘어가면 되고, ICM 압박도 그다지 크지 않은 6명 상황이므로 적극적으로 푸시할 수 있습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 125.8,
+        "foldEV": 119.4,
+        "difference": 6.4,
+        "equity": {
+          "UTG": 15.9,
+          "MP": 13.7,
+          "CO": 18.8,
+          "HERO": 12.3,
+          "SB": 17.3,
+          "BB": 22.0
+        }
+      },
+      "handRange": {
+        "pushRange": "22+, A2+, K7s+, K9o+, Q9s+, QTo+, J9s+, JTo+, T9s, 98s",
+        "foldRange": "더 약한 핸드들"
+      }
+    },
+    {
+      "id": "scenario_009",
+      "title": "BB 리스틸 디펜스",
+      "description": "상대방의 스틸에 대응하는 리스틸 결정입니다.",
+      "difficulty": "intermediate",
+      "tags": ["resteal", "defense", "BB"],
+      "situation": {
+        "playersLeft": 5,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 40,
+          "big": 80,
+          "ante": 10
+        },
+        "heroPosition": "BB",
+        "heroCards": "A4o",
+        "stacks": {
+          "UTG": 0,
+          "MP": 1600,
+          "CO": 900,
+          "BTN": 1100,
+          "SB": 800,
+          "HERO": 1600
+        },
+        "positions": ["MP", "CO", "BTN", "SB", "HERO(BB)"],
+        "actions": [
+          { "position": "MP", "action": "fold" },
+          { "position": "CO", "action": "fold" },
+          { "position": "BTN", "action": "push" },
+          { "position": "SB", "action": "fold" }
+        ],
+        "actionToHero": "MP folds, CO folds, BTN pushes all-in (1100), SB folds",
+        "potSize": 280,
+        "dealerPosition": "SB"
+      },
+      "correctAnswer": "fold",
+      "explanation": {
+        "short": "A4o는 BTN의 푸시에 대해 콜하기에는 약간 약한 핸드입니다.",
+        "detailed": "BTN이 13.75BB로 푸시했을 때, A4o는 경계선 핸드입니다. BTN의 푸시 범위가 넓다고 해도, A4o는 많은 Ax 핸드에 도미네이트됩니다. 20BB 스택으로 더 좋은 스팟을 기다릴 수 있으므로, 이 상황에서는 폴드가 안전합니다. A5o+ 정도가 되어야 콜을 고려할 수 있습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 201.4,
+        "foldEV": 206.8,
+        "difference": -5.4,
+        "equity": {
+          "MP": 23.8,
+          "CO": 13.4,
+          "BTN": 16.3,
+          "SB": 11.9,
+          "HERO": 24.6
+        }
+      },
+      "handRange": {
+        "callRange": "88+, A5s+, A8o+, KTs+, KQo",
+        "foldRange": "A4o, A7o-, KJo-, suited connectors 등"
+      }
+    },
+    {
+      "id": "scenario_010",
+      "title": "파이널 테이블 버블 SB",
+      "description": "파이널 테이블 직전 매우 중요한 버블 상황입니다.",
+      "difficulty": "advanced",
+      "tags": ["final-table-bubble", "critical", "SB"],
+      "situation": {
+        "playersLeft": 4,
+        "payoutPositions": 3,
+        "payoutStructure": [0.5, 0.3, 0.2],
+        "blindLevel": {
+          "small": 100,
+          "big": 200,
+          "ante": 25
+        },
+        "heroPosition": "SB",
+        "heroCards": "TT",
+        "stacks": {
+          "UTG": 500,
+          "MP": 0,
+          "CO": 2500,
+          "BTN": 0,
+          "HERO": 1200,
+          "BB": 2800
+        },
+        "positions": ["UTG", "CO", "HERO(SB)", "BB"],
+        "actions": [
+          { "position": "UTG", "action": "fold" },
+          { "position": "CO", "action": "fold" }
+        ],
+        "actionToHero": "UTG folds, CO folds",
+        "potSize": 325,
+        "dealerPosition": "CO"
+      },
+      "correctAnswer": "fold",
+      "explanation": {
+        "short": "파이널 테이블 버블에서는 TT도 신중하게 접근해야 합니다.",
+        "detailed": "이것은 매우 어려운 결정입니다. TT는 절대적으로 강한 핸드이지만, 파이널 테이블 버블(4명→3명)에서는 ICM 고려사항이 극대화됩니다. 6BB 스택이지만, BB가 콜할 수 있는 범위(99+, AQs+, AKo)에서 TT는 많이 불리합니다. 더 중요한 것은 UTG 플레이어가 2.5BB밖에 없으므로, 조금만 기다려도 그 플레이어가 블라인드를 못 버티고 나갈 가능성이 높습니다."
+      },
+      "icmAnalysis": {
+        "pushEV": 178.2,
+        "foldEV": 184.6,
+        "difference": -6.4,
+        "equity": {
+          "UTG": 4.2,
+          "CO": 35.8,
+          "HERO": 17.8,
+          "BB": 42.2
+        }
+      },
+      "handRange": {
+        "pushRange": "QQ+, AKs, AKo (매우 타이트)",
+        "foldRange": "JJ-, AQs-, AQo- 포함 대부분"
+      }
+    }
+  ],
+  "metadata": {
+    "totalScenarios": 10,
+    "difficultyLevels": {
+      "beginner": 4,
+      "intermediate": 3,
+      "advanced": 3
+    },
+    "tags": {
+      "bubble": 2,
+      "steal": 3,
+      "short-stack": 1,
+      "middle-stack": 1,
+      "big-stack": 1,
+      "push-fold": 1,
+      "heads-up": 1,
+      "deep-stack": 1,
+      "calling-station": 1,
+      "defense": 1,
+      "final-table-bubble": 1,
+      "critical": 1,
+      "UTG": 1,
+      "MP": 1,
+      "CO": 2,
+      "BTN": 4,
+      "SB": 3,
+      "BB": 2
+    },
+    "lastUpdated": "2024-08-07",
+    "author": "ICM SNG Learning App"
+  }
+}
