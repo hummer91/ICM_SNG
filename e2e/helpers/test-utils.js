@@ -11,9 +11,21 @@ export const PokerHands = {
    */
   getHandStrength(hand) {
     const handStrengths = {
-      'AA': 100, 'KK': 95, 'QQ': 90, 'JJ': 85, 'TT': 80,
-      'AKs': 78, '99': 75, 'AQs': 72, 'AKo': 70, 'AJs': 68,
-      '88': 65, 'ATs': 62, 'AQo': 60, 'A9s': 58, 'KQs': 55,
+      AA: 100,
+      KK: 95,
+      QQ: 90,
+      JJ: 85,
+      TT: 80,
+      AKs: 78,
+      99: 75,
+      AQs: 72,
+      AKo: 70,
+      AJs: 68,
+      88: 65,
+      ATs: 62,
+      AQo: 60,
+      A9s: 58,
+      KQs: 55,
       // ... 더 많은 핸드 강도 정의
     };
     return handStrengths[hand] || 0;
@@ -31,7 +43,7 @@ export const PokerHands = {
    */
   isPocketPair(hand) {
     return hand.length === 2 && hand[0] === hand[1];
-  }
+  },
 };
 
 /**
@@ -43,18 +55,18 @@ export const ICMUtils = {
    */
   validateICMSituation(scenario) {
     const { stacks, heroPosition, blindLevel } = scenario.situation;
-    
+
     // 스택이 모두 양수인지 확인
     const stackValues = Object.values(stacks);
-    if (stackValues.some(stack => stack < 0)) {
+    if (stackValues.some((stack) => stack < 0)) {
       throw new Error('Invalid stack values - negative stacks found');
     }
-    
+
     // 블라인드 레벨 검증
     if (blindLevel && blindLevel.big <= blindLevel.small) {
       throw new Error('Invalid blind structure - big blind must be larger than small blind');
     }
-    
+
     // 포지션 검증
     const validPositions = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
     if (!validPositions.includes(heroPosition)) {
@@ -69,17 +81,17 @@ export const ICMUtils = {
    */
   validateEVCalculation(icmAnalysis) {
     const { pushEV, foldEV } = icmAnalysis;
-    
+
     if (typeof pushEV !== 'number' || typeof foldEV !== 'number') {
       throw new Error('EV values must be numbers');
     }
-    
+
     if (pushEV < -1 || pushEV > 1 || foldEV < -1 || foldEV > 1) {
       throw new Error('EV values should be between -1 and 1');
     }
 
     return Math.abs(pushEV - foldEV);
-  }
+  },
 };
 
 /**
@@ -100,37 +112,37 @@ export const ScenarioHelpers = {
         heroCards: 'AKs',
         stacks: {
           UTG: 1000,
-          MP: 1200, 
+          MP: 1200,
           CO: 1500,
           BTN: 1500, // HERO
           SB: 800,
           BB: 1100,
-          HERO: 1500
+          HERO: 1500,
         },
         positions: ['UTG', 'MP', 'CO', 'HERO(BTN)', 'SB', 'BB'],
         actions: [
           { position: 'UTG', action: 'fold' },
           { position: 'MP', action: 'fold' },
-          { position: 'CO', action: 'fold' }
+          { position: 'CO', action: 'fold' },
         ],
         potSize: 75,
         blindLevel: {
           small: 25,
-          big: 50
+          big: 50,
         },
-        actionToHero: 'Folds to Hero on the Button'
+        actionToHero: 'Folds to Hero on the Button',
       },
       correctAnswer: 'push',
       explanation: {
         short: 'AKs is a strong pushing hand',
-        detailed: 'With AKs in position and short stacks, pushing is optimal'
+        detailed: 'With AKs in position and short stacks, pushing is optimal',
       },
       icmAnalysis: {
         pushEV: 0.156,
         foldEV: 0.125,
-        evDifference: 0.031
+        evDifference: 0.031,
       },
-      ...overrides
+      ...overrides,
     };
   },
 
@@ -143,25 +155,25 @@ export const ScenarioHelpers = {
         difficulty: 'beginner',
         situation: {
           heroCards: 'AA',
-          correctAnswer: 'push'
-        }
+          correctAnswer: 'push',
+        },
       }),
       intermediate: this.createTestScenario({
-        difficulty: 'intermediate', 
+        difficulty: 'intermediate',
         situation: {
           heroCards: 'A9s',
-          correctAnswer: 'fold'
-        }
+          correctAnswer: 'fold',
+        },
       }),
       advanced: this.createTestScenario({
         difficulty: 'advanced',
         situation: {
           heroCards: '76s',
-          correctAnswer: 'fold'
-        }
-      })
+          correctAnswer: 'fold',
+        },
+      }),
     };
-  }
+  },
 };
 
 /**
@@ -186,7 +198,7 @@ export const InteractionHelpers = {
         return element && element.textContent.includes(expectedText);
       },
       { selector, expectedText },
-      { timeout }
+      { timeout },
     );
   },
 
@@ -198,22 +210,19 @@ export const InteractionHelpers = {
       ({ key, value }) => {
         localStorage.setItem(key, JSON.stringify(value));
       },
-      { key, value }
+      { key, value },
     );
   },
 
   /**
    * 로컬스토리지 데이터 가져오기
    */
-  async getLocalStorage(page, key) {
-    return await page.evaluate(
-      key => {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : null;
-      },
-      key
-    );
-  }
+  getLocalStorage(page, key) {
+    return page.evaluate((key) => {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : null;
+    }, key);
+  },
 };
 
 /**
@@ -234,15 +243,15 @@ export const PerformanceHelpers = {
   /**
    * ICM 계산 시간 측정
    */
-  async measureICMCalculationTime(page) {
-    return await page.evaluate(() => {
+  measureICMCalculationTime(page) {
+    return page.evaluate(() => {
       const startTime = performance.now();
-      
+
       // ICM 계산 실행 (실제 앱의 계산 함수 호출)
       if (window.ICMCalculator && window.ICMCalculator.calculate) {
         window.ICMCalculator.calculate();
       }
-      
+
       const endTime = performance.now();
       return endTime - startTime;
     });
@@ -251,18 +260,18 @@ export const PerformanceHelpers = {
   /**
    * 메모리 사용량 측정
    */
-  async measureMemoryUsage(page) {
-    return await page.evaluate(() => {
+  measureMemoryUsage(page) {
+    return page.evaluate(() => {
       if (performance.memory) {
         return {
           used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
           total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
-          limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024)
+          limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024),
         };
       }
       return null;
     });
-  }
+  },
 };
 
 /**
@@ -274,11 +283,11 @@ export const DebugHelpers = {
    */
   setupConsoleCapture(page) {
     const logs = [];
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       logs.push({
         type: msg.type(),
         text: msg.text(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
     return logs;
@@ -289,11 +298,11 @@ export const DebugHelpers = {
    */
   setupNetworkErrorCapture(page) {
     const errors = [];
-    page.on('requestfailed', request => {
+    page.on('requestfailed', (request) => {
       errors.push({
         url: request.url(),
         failure: request.failure(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
     return errors;
@@ -305,10 +314,10 @@ export const DebugHelpers = {
   async saveDebugScreenshot(page, testName, stepName) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `debug-${testName}-${stepName}-${timestamp}.png`;
-    await page.screenshot({ 
+    await page.screenshot({
       path: `test-results/screenshots/${filename}`,
-      fullPage: true 
+      fullPage: true,
     });
     return filename;
-  }
+  },
 };

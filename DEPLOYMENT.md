@@ -7,13 +7,14 @@
    - 서브디렉토리 사용시: `yourdomain.com/icm`
 
 2. **프로젝트 빌드**
+
    ```bash
    # 프로젝트 디렉토리로 이동
    cd /home/linuxuser_2/var/www/html/ICM_SNG
-   
+
    # 의존성 설치
    pnpm install
-   
+
    # 프로덕션 빌드
    pnpm build
    ```
@@ -21,6 +22,7 @@
 ## 🚀 Nginx 설정
 
 ### 1. Nginx 설정 파일 복사
+
 ```bash
 # 설정 파일을 sites-available로 복사
 sudo cp nginx-icm-sng.conf /etc/nginx/sites-available/icm-sng
@@ -30,6 +32,7 @@ sudo nano /etc/nginx/sites-available/icm-sng
 ```
 
 ### 2. 도메인 설정 수정
+
 ```nginx
 # 실제 도메인으로 변경
 server_name icm.yourdomain.com;
@@ -42,6 +45,7 @@ server_name YOUR_SERVER_IP;
 ```
 
 ### 3. 설정 활성화
+
 ```bash
 # 심볼릭 링크 생성
 sudo ln -s /etc/nginx/sites-available/icm-sng /etc/nginx/sites-enabled/
@@ -56,6 +60,7 @@ sudo systemctl reload nginx
 ## 🌐 접속 방법
 
 ### 개발 환경 (로컬)
+
 ```bash
 # Vite 개발 서버 실행
 pnpm dev
@@ -64,6 +69,7 @@ pnpm dev
 ```
 
 ### 프로덕션 환경 (서버)
+
 1. **도메인 설정한 경우**
    - http://icm.yourdomain.com
 
@@ -76,6 +82,7 @@ pnpm dev
 ## 🔧 트러블슈팅
 
 ### 1. 403 Forbidden 오류
+
 ```bash
 # 디렉토리 권한 확인
 ls -la /home/linuxuser_2/var/www/html/ICM_SNG
@@ -86,6 +93,7 @@ sudo chmod -R 755 /home/linuxuser_2/var/www/html/ICM_SNG
 ```
 
 ### 2. 404 Not Found 오류
+
 ```bash
 # index.html 파일 존재 확인
 ls -la /home/linuxuser_2/var/www/html/ICM_SNG/index.html
@@ -95,6 +103,7 @@ sudo tail -f /var/log/nginx/icm-sng-error.log
 ```
 
 ### 3. 정적 파일이 로드되지 않음
+
 ```bash
 # 빌드 파일 확인 (프로덕션인 경우)
 ls -la /home/linuxuser_2/var/www/html/ICM_SNG/dist/
@@ -120,6 +129,7 @@ sudo certbot renew --dry-run
 ## 📝 유지보수
 
 ### 로그 확인
+
 ```bash
 # 접속 로그
 sudo tail -f /var/log/nginx/icm-sng-access.log
@@ -129,6 +139,7 @@ sudo tail -f /var/log/nginx/icm-sng-error.log
 ```
 
 ### 업데이트 배포
+
 ```bash
 # 코드 업데이트 후
 cd /home/linuxuser_2/var/www/html/ICM_SNG
@@ -148,5 +159,6 @@ sudo nginx -s reload
 ## 📱 모바일 접속
 
 모바일 기기에서 접속시:
+
 - 반응형 디자인이 적용되어 자동으로 모바일 레이아웃으로 전환
 - 터치 제스처 지원 (향후 구현 예정)

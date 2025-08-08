@@ -24,7 +24,7 @@ export const test = base.extend({
 class PokerGamePage {
   constructor(page) {
     this.page = page;
-    
+
     // 주요 요소 셀렉터
     this.selectors = {
       // 퀴즈 관련
@@ -32,29 +32,29 @@ class PokerGamePage {
       foldButton: 'button[data-testid="fold-button"], button[data-action="fold"]',
       newScenarioButton: 'button[data-testid="new-scenario"], button.new-scenario-btn',
       checkAnswerButton: 'button[data-testid="check-answer"], button.check-answer-btn',
-      
+
       // 포커 테이블
       pokerTable: '.poker-table, .game-table',
       playerCards: '[data-player-index]',
       heroPlayer: '[data-player-index="3"], .hero-player',
       potAmount: '.pot-amount, .pot-size',
-      
+
       // 시나리오 정보
       scenarioTitle: '#scenario-title, .scenario-title',
       scenarioHand: '#scenario-hand, .scenario-hand',
       scenarioPosition: '#scenario-position, .scenario-position',
       scenarioStack: '#scenario-stack, .scenario-stack',
-      
+
       // 피드백 및 결과
       feedbackModal: '.feedback-modal, .result-modal',
       correctAnswer: '.correct-answer, .answer-correct',
       wrongAnswer: '.wrong-answer, .answer-wrong',
       evDisplay: '.ev-display, .icm-ev',
-      
-      // 통계 
+
+      // 통계
       statsPanel: '.stats-panel, .quiz-stats',
       accuracyRate: '.accuracy-rate',
-      totalQuestions: '.total-questions'
+      totalQuestions: '.total-questions',
     };
   }
 
@@ -72,12 +72,13 @@ class PokerGamePage {
   async waitForInitialization() {
     // 포커 테이블이 로드될 때까지 대기
     await this.page.waitForSelector(this.selectors.pokerTable, { timeout: 10000 });
-    
+
     // 시나리오 데이터 로드 대기
-    await this.page.waitForFunction(() => {
-      return window.ScenarioManager && window.ScenarioManager.getCurrentScenario();
-    }, { timeout: 10000 });
-    
+    await this.page.waitForFunction(
+      () => window.ScenarioManager && window.ScenarioManager.getCurrentScenario(),
+      { timeout: 10000 },
+    );
+
     // HERO 플레이어가 설정될 때까지 대기
     await this.page.waitForSelector(this.selectors.heroPlayer, { timeout: 5000 });
   }
@@ -91,7 +92,7 @@ class PokerGamePage {
   }
 
   /**
-   * Fold 버튼 클릭  
+   * Fold 버튼 클릭
    */
   async clickFold() {
     await this.page.click(this.selectors.foldButton);
@@ -118,28 +119,27 @@ class PokerGamePage {
    * 시나리오 로드 완료 대기
    */
   async waitForScenarioLoad() {
-    await this.page.waitForFunction(() => {
-      const scenario = window.ScenarioManager?.getCurrentScenario();
-      return scenario && scenario.situation && scenario.situation.heroCards;
-    }, { timeout: 5000 });
+    await this.page.waitForFunction(
+      () => {
+        const scenario = window.ScenarioManager?.getCurrentScenario();
+        return scenario && scenario.situation && scenario.situation.heroCards;
+      },
+      { timeout: 5000 },
+    );
   }
 
   /**
    * 현재 시나리오 정보 가져오기
    */
-  async getScenarioInfo() {
-    return await this.page.evaluate(() => {
-      return window.ScenarioManager?.getCurrentScenario();
-    });
+  getScenarioInfo() {
+    return this.page.evaluate(() => window.ScenarioManager?.getCurrentScenario());
   }
 
   /**
    * 퀴즈 통계 가져오기
    */
-  async getQuizStats() {
-    return await this.page.evaluate(() => {
-      return window.ScenarioManager?.getQuizStats();
-    });
+  getQuizStats() {
+    return this.page.evaluate(() => window.ScenarioManager?.getQuizStats());
   }
 
   /**
@@ -153,21 +153,23 @@ class PokerGamePage {
   /**
    * 플레이어 상태 확인
    */
-  async getPlayerStates() {
-    return await this.page.evaluate(() => {
+  getPlayerStates() {
+    return this.page.evaluate(() => {
       const players = [];
       for (let i = 0; i < 6; i++) {
         const element = document.querySelector(`[data-player-index="${i}"]`);
         if (element) {
           const nameElement = element.querySelector('.player-name');
           const chipsElement = element.querySelector('.chip-bb-main, .player-chips');
-          
+
           players.push({
             index: i,
             name: nameElement?.textContent || '',
             chips: chipsElement?.textContent || '',
-            isHero: element.classList.contains('hero-player') || nameElement?.classList.contains('hero-player'),
-            isEmpty: nameElement?.classList.contains('empty-seat')
+            isHero:
+              element.classList.contains('hero-player') ||
+              nameElement?.classList.contains('hero-player'),
+            isEmpty: nameElement?.classList.contains('empty-seat'),
           });
         }
       }
@@ -178,9 +180,9 @@ class PokerGamePage {
   /**
    * 콘솔 에러 확인
    */
-  async getConsoleErrors() {
+  getConsoleErrors() {
     const errors = [];
-    this.page.on('console', msg => {
+    this.page.on('console', (msg) => {
       if (msg.type() === 'error') {
         errors.push(msg.text());
       }
@@ -191,13 +193,13 @@ class PokerGamePage {
   /**
    * 네트워크 요청 모니터링
    */
-  async monitorNetworkRequests() {
+  monitorNetworkRequests() {
     const requests = [];
-    this.page.on('request', request => {
+    this.page.on('request', (request) => {
       requests.push({
         url: request.url(),
         method: request.method(),
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     });
     return requests;

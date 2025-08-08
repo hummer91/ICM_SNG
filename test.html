@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICM SNG Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        .poker-table {
+            width: 400px;
+            height: 300px;
+            background: #0d4a0d;
+            border-radius: 150px;
+            margin: 20px auto;
+            position: relative;
+            border: 3px solid #2d5a2d;
+        }
+        .player-seat {
+            position: absolute;
+            width: 80px;
+            height: 60px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            border: 2px solid #444;
+        }
+        .seat-0 { top: 10px; left: 50%; transform: translateX(-50%); }
+        .seat-1 { top: 30%; right: 10px; }
+        .seat-2 { bottom: 30%; right: 10px; }
+        .seat-3 { bottom: 10px; left: 50%; transform: translateX(-50%); background: #5e6ad2; }
+        .seat-4 { bottom: 30%; left: 10px; }
+        .seat-5 { top: 30%; left: 10px; }
+        .hero { background: #5e6ad2 !important; }
+        .status { margin: 20px 0; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>ICM SNG 포커 학습 앱 - 테스트 페이지</h1>
+    
+    <div class="poker-table">
+        <div class="player-seat seat-0">UTG</div>
+        <div class="player-seat seat-1">MP</div>
+        <div class="player-seat seat-2">CO</div>
+        <div class="player-seat seat-3 hero">HERO<br>BTN</div>
+        <div class="player-seat seat-4">SB</div>
+        <div class="player-seat seat-5">BB</div>
+    </div>
+    
+    <div class="status">
+        <p>✅ 기본 HTML/CSS 로딩 완료</p>
+        <p id="js-status">❌ JavaScript 테스트 대기중...</p>
+    </div>
+    
+    <button onclick="testApp()">앱 기능 테스트</button>
+    
+    <div id="test-results"></div>
+    
+    <script>
+        console.log('Test page loaded');
+        document.getElementById('js-status').innerHTML = '✅ JavaScript 실행 완료';
+        
+        async function testApp() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<h3>테스트 결과:</h3>';
+            
+            try {
+                // Test 1: Fetch scenarios
+                results.innerHTML += '<p>🔄 시나리오 데이터 로딩 테스트...</p>';
+                const response = await fetch('/src/data/scenarios.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    results.innerHTML += `<p>✅ 시나리오 ${data.scenarios?.length || 0}개 로딩 성공</p>`;
+                } else {
+                    results.innerHTML += `<p>❌ 시나리오 데이터 로딩 실패: ${response.status}</p>`;
+                }
+                
+                // Test 2: Test CSS loading
+                results.innerHTML += '<p>🔄 CSS 로딩 테스트...</p>';
+                const cssResponse = await fetch('/src/css/main.css');
+                if (cssResponse.ok) {
+                    results.innerHTML += '<p>✅ CSS 파일 로딩 성공</p>';
+                } else {
+                    results.innerHTML += `<p>❌ CSS 파일 로딩 실패: ${cssResponse.status}</p>`;
+                }
+                
+                // Test 3: Test module loading (if possible)
+                results.innerHTML += '<p>🔄 ES6 모듈 지원 테스트...</p>';
+                if (typeof import !== 'undefined') {
+                    results.innerHTML += '<p>✅ ES6 모듈 지원됨</p>';
+                    
+                    try {
+                        const module = await import('/src/js/scenario.js');
+                        results.innerHTML += '<p>✅ scenario.js 모듈 로딩 성공</p>';
+                    } catch (error) {
+                        results.innerHTML += `<p>❌ 모듈 로딩 실패: ${error.message}</p>`;
+                    }
+                } else {
+                    results.innerHTML += '<p>❌ ES6 모듈이 지원되지 않음</p>';
+                }
+                
+            } catch (error) {
+                results.innerHTML += `<p>❌ 테스트 중 오류 발생: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

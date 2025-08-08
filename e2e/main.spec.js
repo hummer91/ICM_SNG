@@ -7,10 +7,10 @@ test.describe('메인 페이지', () => {
 
   test('페이지가 정상적으로 로드되어야 함', async ({ page }) => {
     await expect(page).toHaveTitle(/ICM SNG 포커 학습 앱/);
-    
+
     // 로딩 화면이 사라져야 함
     await expect(page.locator('#loading')).not.toBeVisible();
-    
+
     // 앱 컨테이너가 표시되어야 함
     await expect(page.locator('#app')).toBeVisible();
   });
@@ -23,19 +23,19 @@ test.describe('메인 페이지', () => {
 
   test('Inter 폰트가 로드되어야 함', async ({ page }) => {
     // 폰트가 적용된 요소 확인
-    const fontFamily = await page.locator('body').evaluate(el => 
-      window.getComputedStyle(el).fontFamily
-    );
-    
+    const fontFamily = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).fontFamily);
+
     expect(fontFamily).toContain('Inter');
   });
 
   test('다크 테마가 적용되어야 함', async ({ page }) => {
     // 배경색 확인
-    const backgroundColor = await page.locator('body').evaluate(el => 
-      window.getComputedStyle(el).backgroundColor
-    );
-    
+    const backgroundColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+
     // rgb(8, 9, 10) = --bg-primary
     expect(backgroundColor).toBe('rgb(8, 9, 10)');
   });
@@ -60,27 +60,27 @@ test.describe('메인 페이지', () => {
   test('JavaScript 모듈이 로드되어야 함', async ({ page }) => {
     // 콘솔 로그 확인
     const logs = [];
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       if (msg.type() === 'log') {
         logs.push(msg.text());
       }
     });
-    
+
     await page.reload();
     await page.waitForTimeout(1000); // 모듈 로드 대기
-    
-    expect(logs.some(log => log.includes('앱 초기화'))).toBe(true);
+
+    expect(logs.some((log) => log.includes('앱 초기화'))).toBe(true);
   });
 
   test('에러가 발생하지 않아야 함', async ({ page }) => {
     const errors = [];
-    page.on('pageerror', error => {
+    page.on('pageerror', (error) => {
       errors.push(error.message);
     });
-    
+
     await page.reload();
     await page.waitForTimeout(1000);
-    
+
     expect(errors).toHaveLength(0);
   });
 
@@ -89,7 +89,7 @@ test.describe('메인 페이지', () => {
       const startTime = Date.now();
       await page.goto('/', { waitUntil: 'networkidle' });
       const loadTime = Date.now() - startTime;
-      
+
       // 3초 이내에 로드되어야 함
       expect(loadTime).toBeLessThan(3000);
     });
@@ -98,11 +98,12 @@ test.describe('메인 페이지', () => {
       const metrics = await page.evaluate(() => {
         const navigation = performance.getEntriesByType('navigation')[0];
         return {
-          domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
-          loadComplete: navigation.loadEventEnd - navigation.loadEventStart
+          domContentLoaded:
+            navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+          loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
         };
       });
-      
+
       // DOM 로드가 빨라야 함
       expect(metrics.domContentLoaded).toBeLessThan(100);
     });
@@ -117,7 +118,7 @@ test.describe('메인 페이지', () => {
     test('이미지에 alt 텍스트가 있어야 함', async ({ page }) => {
       const images = page.locator('img');
       const count = await images.count();
-      
+
       for (let i = 0; i < count; i++) {
         const img = images.nth(i);
         const alt = await img.getAttribute('alt');
