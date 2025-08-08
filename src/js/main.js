@@ -17,6 +17,9 @@ import { initializeGameLayout } from './ui/views/gameLayout.js';
 // 시나리오 시스템 임포트
 import { initializeScenarios } from './scenario.js';
 
+// 검증 시스템 임포트
+import { scenarioValidator, validateScenariosInConsole } from './validation.js';
+
 // 보안 초기화
 function initializeSecurity() {
   try {
@@ -81,6 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeScenarios().then((success) => {
     if (success) {
       console.info('퀴즈 시나리오 시스템 준비 완료');
+
+      // 개발 모드에서 시나리오 검증 실행
+      if (config.debug) {
+        console.info('개발 모드: 시나리오 자동 검증 실행');
+        validateScenariosInConsole().catch((error) => {
+          console.error('자동 검증 실행 중 오류:', error);
+        });
+
+        // 브라우저 콘솔에서 수동 검증 함수 등록
+        window.validateScenarios = validateScenariosInConsole;
+        window.scenarioValidator = scenarioValidator;
+        console.info('콘솔에서 validateScenarios() 함수로 시나리오를 검증할 수 있습니다.');
+      }
     } else {
       console.warn('시나리오 시스템 초기화 실패 - 기본 모드로 실행');
     }

@@ -149,13 +149,13 @@
         "pot": 50,
         "playerBets": {
           "SB": 3450,
-          "HERO": 0
+          "HERO": 200
         },
         "remainingStacks": {
           "SB": 0,
-          "HERO": 1625
+          "HERO": 1425
         },
-        "totalPotForCalculation": 3500,
+        "totalPotForCalculation": 3700,
         "positions": ["SB", "HERO(BB)"],
         "actions": [
           { "position": "SB", "action": "push" }
@@ -261,16 +261,16 @@
           "CO": 0,
           "BTN": 825,
           "SB": 100,
-          "HERO": 0
+          "HERO": 200
         },
         "remainingStacks": {
           "UTG": 1475,
           "CO": 2175,
           "BTN": 0,
           "SB": 875,
-          "HERO": 975
+          "HERO": 775
         },
-        "totalPotForCalculation": 1050,
+        "totalPotForCalculation": 1250,
         "positions": ["UTG", "CO", "BTN", "SB", "HERO(BB)"],
         "actions": [
           { "position": "UTG", "action": "fold" },
@@ -283,19 +283,19 @@
       },
       "correctAnswer": "push",
       "explanation": {
-        "short": "5BB에서 Q6o는 팟 오즈상 콜해야 합니다.",
-        "detailed": "5BB 스택에서 상대의 푸시에 대해 Q6o는 충분히 콜할만합니다. 팟에 이미 650칩이 있고, 800을 더 내면 1450 팟을 가져갈 수 있습니다. Q6o가 상대 범위에 대해 약 35% 승률만 있어도 콜이 유리하며, 실제로는 그보다 높을 가능성이 큽니다."
+        "short": "3.9BB에서 Q6o는 팟 오즈상 콜해야 합니다.",
+        "detailed": "3.9BB 남은 스택에서 BTN의 푸시에 대해 Q6o는 충분히 콜할만합니다. 팟에 이미 1050칩이 있고 (안티 125 + SB 100 + BB 200 + BTN 올인 825), 575를 더 내면 1625 팟을 가져갈 수 있습니다. 2.8:1 팟 오즈를 받고 있으므로 Q6o가 약 26% 승률만 있어도 콜이 유리합니다."
       },
       "icmAnalysis": {
-        "pushEV": 147.8,
-        "foldEV": 128.5,
-        "difference": 19.3,
+        "pushEV": 145.2,
+        "foldEV": 126.8,
+        "difference": 18.4,
         "equity": {
-          "UTG": 28.2,
-          "MP": 41.5,
-          "CO": 15.1,
-          "SB": 15.2,
-          "HERO": 0
+          "UTG": 29.1,
+          "CO": 42.3,
+          "BTN": 0.0,
+          "SB": 15.8,
+          "HERO": 12.8
         }
       },
       "handRange": {

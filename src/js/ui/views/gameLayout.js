@@ -15,6 +15,10 @@ import {
   getCurrentScenario,
 } from '../../scenario.js';
 
+// 전역 변수
+let currentExplanationModal = null;
+let isExplanationModalBlocked = false;
+
 /**
  * 게임 레이아웃 초기화
  */
@@ -406,6 +410,7 @@ function handleQuizAction(action) {
  * 정답 확인 처리
  */
 function handleCheckAnswer() {
+  console.log('🔍 handleCheckAnswer() 호출됨'); // 디버깅용
   const userAnswer = window.currentQuizAction;
 
   if (!userAnswer) {
@@ -471,8 +476,28 @@ function handleCheckAnswer() {
  * 해설 모달 표시
  */
 function showExplanationModal(result, evDifference) {
+  const timestamp = new Date().toISOString();
+  console.log('🔥 showExplanationModal() 호출됨!', {
+    scenario: result?.scenario?.title,
+    isCorrect: result?.isCorrect,
+    userAnswer: result?.userAnswer,
+    timestamp,
+    isBlocked: isExplanationModalBlocked,
+    hasCurrentModal: Boolean(currentExplanationModal),
+  });
+
+  // 차단된 상태면 무시
+  if (isExplanationModalBlocked) {
+    console.log('🚫 해설 모달이 차단됨 - 무시');
+    console.trace('🚫 차단된 호출의 스택 트레이스:');
+    return;
+  }
+
+  console.trace('📍 showExplanationModal 호출 스택:');
   const scenario = getCurrentScenario();
-  if (!scenario) return;
+  if (!scenario) {
+    return;
+  }
 
   const evSign = evDifference > 0 ? '+' : '';
   const evText = `${evSign}${evDifference.toFixed(1)}% EV`;
@@ -663,15 +688,20 @@ function showDetailedExplanation(result, _evDifference) {
           <div class="situation-summary">
             <p><strong>포지션:</strong> ${scenario.situation.heroPosition}</p>
             <p><strong>핸드:</strong> ${scenario.situation.heroCards}</p>
-            <p><strong>스택 크기:</strong> ${scenario.situation.stacks.HERO} (${(scenario.situation.stacks.HERO / scenario.situation.blindLevel.big).toFixed(1)} BB)</p>
+            <p><strong>스택 크기:</strong> ${scenario.situation.remainingStacks.HERO} (${(scenario.situation.remainingStacks.HERO / scenario.situation.blindLevel.big).toFixed(1)} BB)</p>
           </div>
         </div>
       </div>
     </div>
   `;
 
+  // 기존 모달이 있으면 먼저 닫기
+  if (currentExplanationModal && currentExplanationModal.isOpen) {
+    currentExplanationModal.close();
+  }
+
   // 모달 생성 및 표시
-  const explanationModal = Modal.create({
+  currentExplanationModal = Modal.create({
     title: '상세 해설',
     content: explanationContent,
     size: 'large',
@@ -681,18 +711,29 @@ function showDetailedExplanation(result, _evDifference) {
         variant: 'primary',
         onClick: (e, modal) => {
           modal.close();
+          currentExplanationModal = null; // 참조 제거
           handleNewScenario();
         },
       },
       {
         text: '닫기',
         variant: 'secondary',
-        onClick: (e, modal) => modal.close(),
+        onClick: (e, modal) => {
+          modal.close();
+          currentExplanationModal = null; // 참조 제거
+        },
       },
     ],
   });
 
-  explanationModal.open();
+  // 차단 상태 재확인 (비동기 호출 대비)
+  if (isExplanationModalBlocked) {
+    console.log('🚫 모달 열기 직전 차단 감지 - 무시');
+    return;
+  }
+
+  currentExplanationModal.open();
+  console.log('📖 해설 모달 열림. isOpen:', currentExplanationModal.isOpen);
 }
 
 /**
@@ -915,6 +956,8 @@ function displayICMAnalysis(icmAnalysis, isCorrect, userAnswer) {
  */
 function handleNewScenario() {
   try {
+    console.log('🆕 handleNewScenario() 호출됨');
+
     // 다음 시나리오 선택
     const nextScenario = selectNextScenario();
 
@@ -943,6 +986,16 @@ function handleNewScenario() {
  * 퀴즈 UI 상태 초기화
  */
 function resetQuizUI() {
+  console.log('🔄 resetQuizUI() 호출됨'); // 디버깅용
+
+  // 해설 모달 차단 설정 (새 시나리오 로딩 중)
+  isExplanationModalBlocked = true;
+  console.log('🚧 해설 모달 차단 활성화');
+
+  // 혹시 모를 비동기 호출 차단을 위해 전역 참조 임시 제거
+  currentExplanationModal = null;
+  console.log('🔒 전역 모달 참조 임시 제거');
+
   // 액션 버튼 선택 해제 및 정답 표시 제거
   document.querySelectorAll('.quiz-action-btn').forEach((btn) => {
     btn.classList.remove('selected', 'correct-answer', 'wrong-answer');
@@ -959,6 +1012,7 @@ function resetQuizUI() {
   if (checkAnswerBtn) {
     checkAnswerBtn.disabled = true;
     checkAnswerBtn.classList.add('disabled');
+    console.log('✅ 정답 확인 버튼 비활성화됨');
   }
 
   // 새 시나리오 버튼 비활성화
@@ -966,16 +1020,65 @@ function resetQuizUI() {
   if (newScenarioBtn) {
     newScenarioBtn.disabled = true;
     newScenarioBtn.classList.add('disabled');
+    console.log('✅ 새 시나리오 버튼 비활성화됨');
   }
 
-  // ICM 분석 패널 제거
+  // ICM 분석 패널 내용 초기화 (제거 대신 내용만 지우기)
   const icmPanel = document.querySelector('.icm-analysis-panel');
   if (icmPanel) {
-    icmPanel.remove();
+    icmPanel.innerHTML = '';
+    icmPanel.style.display = 'none';
+    console.log('✅ ICM 패널 초기화됨');
   }
+
+  // 모든 정답 관련 클래스 제거
+  document.querySelectorAll('.quiz-controls button').forEach((btn) => {
+    btn.classList.remove('quiz-answered');
+  });
+
+  // 해설 모달 닫기
+  console.log('🔍 모달 체크:', {
+    hasModal: Boolean(currentExplanationModal),
+    isOpen: currentExplanationModal?.isOpen,
+  });
+
+  if (currentExplanationModal) {
+    console.log('🚫 해설 모달 강제 종료 시도');
+    currentExplanationModal.close();
+    currentExplanationModal = null;
+    console.log('✅ 해설 모달 참조 제거됨');
+  }
+
+  // DOM에서 모든 모달 오버레이 강제 제거
+  const modalOverlays = document.querySelectorAll('.modal-overlay');
+  modalOverlays.forEach((overlay, index) => {
+    console.log(`🗑️ 모달 오버레이 ${index + 1} 강제 제거`);
+    overlay.remove();
+  });
+
+  // Modal 컨텐츠도 강제 제거 (혹시 남아있을 수 있음)
+  const modalContents = document.querySelectorAll('.modal-content');
+  modalContents.forEach((content, index) => {
+    console.log(`🗑️ 모달 컨텐츠 ${index + 1} 강제 제거`);
+    content.remove();
+  });
+
+  // body 스크롤 복원 (모달이 제거되었으므로)
+  document.body.style.overflow = '';
+  console.log('🔄 body 스크롤 복원');
+
+  console.log('🧹 모든 모달 DOM 정리 완료');
 
   // 현재 선택된 액션 초기화
   window.currentQuizAction = null;
+
+  console.log('🎯 퀴즈 UI 초기화 완료');
+
+  // 잠시 후 해설 모달 차단 해제 (새 시나리오 로딩 완료)
+  setTimeout(() => {
+    isExplanationModalBlocked = false;
+    console.log('✅ 해설 모달 차단 해제');
+  }, 500);
 }
 
 /**
@@ -986,7 +1089,7 @@ function resetQuizUI() {
 /**
  * 딜러 버튼 기능 제거됨 - 퀴즈 모드에서는 필요 없음
  */
-function updateDealerButton(playerIndex) {
+function updateDealerButton(_playerIndex) {
   // 딜러 버튼 기능이 제거되었습니다
 }
 

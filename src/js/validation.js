@@ -1031,8 +1031,438 @@ export class DataValidator {
   }
 }
 
+/**
+ * 시나리오 데이터 검증 시스템
+ * 포커 기본 규칙과 ICM 계산 무결성을 자동 검증
+ */
+export class ScenarioValidator {
+  constructor() {
+    this.validationRules = {
+      blindPosting: true,
+      antePosting: true,
+      stackConsistency: true,
+      positionLogic: true,
+      icmCalculation: true,
+    };
+  }
+
+  /**
+   * 전체 시나리오 검증
+   * @param {Array} scenarios - 검증할 시나리오 배열
+   * @returns {Object} 검증 결과와 오류 목록
+   */
+  validateAllScenarios(scenarios) {
+    const results = {
+      totalScenarios: scenarios.length,
+      passedScenarios: 0,
+      failedScenarios: 0,
+      errors: [],
+      warnings: [],
+    };
+
+    scenarios.forEach((scenario, index) => {
+      const scenarioResult = this.validateScenario(scenario, index + 1);
+
+      if (scenarioResult.isValid) {
+        results.passedScenarios++;
+      } else {
+        results.failedScenarios++;
+        results.errors.push({
+          scenarioId: scenario.id,
+          scenarioIndex: index + 1,
+          errors: scenarioResult.errors,
+        });
+      }
+
+      if (scenarioResult.warnings.length > 0) {
+        results.warnings.push({
+          scenarioId: scenario.id,
+          scenarioIndex: index + 1,
+          warnings: scenarioResult.warnings,
+        });
+      }
+    });
+
+    return results;
+  }
+
+  /**
+   * 개별 시나리오 검증
+   * @param {Object} scenario - 검증할 시나리오 객체
+   * @param {number} index - 시나리오 인덱스
+   * @returns {Object} 검증 결과
+   */
+  validateScenario(scenario, index) {
+    const result = {
+      isValid: true,
+      errors: [],
+      warnings: [],
+    };
+
+    try {
+      // 1. 블라인드 포스팅 검증
+      this.validateBlindPosting(scenario, result);
+
+      // 2. 안테 포스팅 검증
+      this.validateAntePosting(scenario, result);
+
+      // 3. 스택 일관성 검증
+      this.validateStackConsistency(scenario, result);
+
+      // 4. 포지션 로직 검증
+      this.validatePositionLogic(scenario, result);
+
+      // 5. 팟 계산 검증
+      this.validatePotCalculation(scenario, result);
+
+      // 6. ICM 데이터 일관성 검증
+      this.validateICMData(scenario, result);
+
+      // 오류가 있으면 전체 검증 실패
+      if (result.errors.length > 0) {
+        result.isValid = false;
+      }
+    } catch (error) {
+      result.isValid = false;
+      result.errors.push(`시나리오 ${index} 검증 중 예외 발생: ${error.message}`);
+    }
+
+    return result;
+  }
+
+  /**
+   * 블라인드 포스팅 규칙 검증
+   * - SB는 small blind 금액을 포스팅해야 함
+   * - BB는 big blind 금액을 포스팅해야 함
+   */
+  validateBlindPosting(scenario, result) {
+    const { situation } = scenario;
+    const { blindLevel, playerBets, positions } = situation;
+
+    // 포지션별 플레이어 찾기
+    const sbPlayer = positions.find((pos) => pos.includes('SB') || pos === 'SB');
+    const bbPlayer = positions.find((pos) => pos.includes('BB') || pos === 'BB');
+
+    // SB 검증
+    if (sbPlayer) {
+      const sbKey = sbPlayer.includes('HERO') ? 'HERO' : 'SB';
+      const expectedSB = blindLevel.small;
+      const actualSB = playerBets[sbKey] || 0;
+
+      // SB가 올인한 경우가 아니라면 정확히 small blind를 포스팅해야 함
+      const remainingStack = situation.remainingStacks[sbKey];
+      const isAllIn = remainingStack === 0 && actualSB > 0;
+
+      if (!isAllIn && actualSB !== expectedSB) {
+        result.errors.push(
+          `블라인드 포스팅 오류: SB(${sbKey})는 ${expectedSB}을 포스팅해야 하지만 ${actualSB}을 포스팅했습니다.`,
+        );
+      } else if (isAllIn && actualSB < expectedSB) {
+        // 올인인데 SB보다 적게 베팅한 경우 (숏스택 상황)
+        result.warnings.push(
+          `SB 숏스택 올인: SB(${sbKey})가 ${expectedSB} 대신 ${actualSB}을 올인했습니다 (숏스택).`,
+        );
+      }
+    }
+
+    // BB 검증
+    if (bbPlayer) {
+      const bbKey = bbPlayer.includes('HERO') ? 'HERO' : 'BB';
+      const expectedBB = blindLevel.big;
+      const actualBB = playerBets[bbKey] || 0;
+
+      // BB가 올인한 경우가 아니라면 정확히 big blind를 포스팅해야 함
+      const remainingStack = situation.remainingStacks[bbKey];
+      const isAllIn = remainingStack === 0 && actualBB > 0;
+
+      if (!isAllIn && actualBB !== expectedBB) {
+        result.errors.push(
+          `블라인드 포스팅 오류: BB(${bbKey})는 ${expectedBB}를 포스팅해야 하지만 ${actualBB}을 포스팅했습니다.`,
+        );
+      }
+    }
+  }
+
+  /**
+   * 안테 포스팅 검증
+   * - 모든 활성 플레이어가 안테를 포스팅했는지 확인
+   */
+  validateAntePosting(scenario, result) {
+    const { situation } = scenario;
+    const { blindLevel, playersLeft } = situation;
+    const expectedTotalAnte = blindLevel.ante * playersLeft;
+    const actualTotalAnte = situation.pot || 0;
+
+    if (expectedTotalAnte !== actualTotalAnte) {
+      result.warnings.push(
+        `안테 계산 불일치: 예상 안테 ${expectedTotalAnte}, 실제 팟 ${actualTotalAnte}`,
+      );
+    }
+  }
+
+  /**
+   * 스택 일관성 검증
+   * - remainingStacks + playerBets = 원래 스택
+   * - 0 스택 플레이어는 올인 상태여야 함
+   */
+  validateStackConsistency(scenario, result) {
+    const { situation } = scenario;
+    const { playerBets, remainingStacks } = situation;
+
+    Object.keys(playerBets).forEach((player) => {
+      const bet = playerBets[player] || 0;
+      const stack = remainingStacks[player] || 0;
+
+      // 스택이 0이면 반드시 베팅이 있어야 함 (올인 상태)
+      if (stack === 0 && bet === 0) {
+        result.errors.push(
+          `스택 일관성 오류: ${player}의 스택이 0인데 베팅도 0입니다. 올인 상태가 아닙니다.`,
+        );
+      }
+
+      // 베팅이 있으면 스택이나 베팅 중 하나는 0보다 커야 함
+      if (bet < 0 || stack < 0) {
+        result.errors.push(
+          `스택 일관성 오류: ${player}의 베팅(${bet}) 또는 스택(${stack})이 음수입니다.`,
+        );
+      }
+    });
+  }
+
+  /**
+   * 포지션 로직 검증
+   * - 딜러 포지션이 올바른지 확인
+   * - 포지션 순서가 올바른지 확인
+   */
+  validatePositionLogic(scenario, result) {
+    const { situation } = scenario;
+    const { positions, dealerPosition, playersLeft } = situation;
+
+    // 포지션 수와 남은 플레이어 수 일치 확인
+    if (positions.length !== playersLeft) {
+      result.errors.push(
+        `포지션 불일치: 포지션 배열 길이(${positions.length})와 남은 플레이어 수(${playersLeft})가 다릅니다.`,
+      );
+    }
+
+    // 딜러 포지션이 포지션 배열에 있는지 확인
+    const dealerInPositions = positions.some(
+      (pos) => pos === dealerPosition || pos.includes(dealerPosition),
+    );
+
+    if (!dealerInPositions) {
+      result.warnings.push(`딜러 포지션 경고: 딜러(${dealerPosition})가 포지션 배열에 없습니다.`);
+    }
+  }
+
+  /**
+   * 팟 계산 검증
+   * - totalPotForCalculation = pot + sum(playerBets)
+   */
+  validatePotCalculation(scenario, result) {
+    const { situation } = scenario;
+    const { pot, playerBets, totalPotForCalculation } = situation;
+
+    const calculatedTotal = pot + Object.values(playerBets).reduce((sum, bet) => sum + bet, 0);
+
+    if (calculatedTotal !== totalPotForCalculation) {
+      result.errors.push(
+        `팟 계산 오류: 계산된 총 팟(${calculatedTotal})과 저장된 값(${totalPotForCalculation})이 다릅니다.`,
+      );
+    }
+  }
+
+  /**
+   * ICM 데이터 일관성 검증
+   * - equity 합계가 100에 가까운지 확인
+   * - pushEV > foldEV인 경우 정답이 push인지 확인
+   */
+  validateICMData(scenario, result) {
+    const { icmAnalysis, correctAnswer } = scenario;
+
+    if (icmAnalysis) {
+      // Equity 합계 검증 (오차 허용 범위 ±2%)
+      if (icmAnalysis.equity) {
+        const totalEquity = Object.values(icmAnalysis.equity).reduce((sum, eq) => sum + eq, 0);
+        if (Math.abs(totalEquity - 100) > 2) {
+          result.warnings.push(`ICM equity 합계가 100에서 벗어남: ${totalEquity.toFixed(1)}%`);
+        }
+      }
+
+      // EV 차이와 정답 일관성 검증
+      const { pushEV, foldEV, difference } = icmAnalysis;
+      if (pushEV && foldEV) {
+        const calculatedDiff = pushEV - foldEV;
+
+        // EV 차이 계산 검증
+        if (Math.abs(calculatedDiff - difference) > 0.1) {
+          result.warnings.push(
+            `EV 차이 불일치: 계산값(${calculatedDiff.toFixed(1)}) vs 저장값(${difference})`,
+          );
+        }
+
+        // 정답과 EV 일관성 검증
+        if (pushEV > foldEV && correctAnswer !== 'push') {
+          result.errors.push(
+            `정답 불일치: pushEV(${pushEV}) > foldEV(${foldEV})인데 정답이 '${correctAnswer}'입니다.`,
+          );
+        } else if (foldEV > pushEV && correctAnswer !== 'fold') {
+          result.errors.push(
+            `정답 불일치: foldEV(${foldEV}) > pushEV(${pushEV})인데 정답이 '${correctAnswer}'입니다.`,
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * 검증 결과를 콘솔에 출력
+   * @param {Object} results - validateAllScenarios 결과
+   */
+  printValidationResults(results) {
+    console.group('🎯 시나리오 검증 결과');
+
+    console.log(`📊 전체 시나리오: ${results.totalScenarios}`);
+    console.log(`✅ 통과: ${results.passedScenarios}`);
+    console.log(`❌ 실패: ${results.failedScenarios}`);
+
+    if (results.errors.length > 0) {
+      console.group('❌ 오류 목록');
+      results.errors.forEach((error) => {
+        console.group(`시나리오 ${error.scenarioIndex} (${error.scenarioId})`);
+        error.errors.forEach((err) => console.error(`• ${err}`));
+        console.groupEnd();
+      });
+      console.groupEnd();
+    }
+
+    if (results.warnings.length > 0) {
+      console.group('⚠️ 경고 목록');
+      results.warnings.forEach((warning) => {
+        console.group(`시나리오 ${warning.scenarioIndex} (${warning.scenarioId})`);
+        warning.warnings.forEach((warn) => console.warn(`• ${warn}`));
+        console.groupEnd();
+      });
+      console.groupEnd();
+    }
+
+    console.groupEnd();
+  }
+}
+
+/**
+ * 시나리오 데이터 자동 수정 도구
+ */
+export class ScenarioAutoFixer {
+  constructor() {
+    this.validator = new ScenarioValidator();
+  }
+
+  /**
+   * 블라인드 포스팅 자동 수정
+   * @param {Object} scenario - 수정할 시나리오
+   * @returns {Object} 수정된 시나리오
+   */
+  fixBlindPosting(scenario) {
+    const { situation } = scenario;
+    const { blindLevel, positions } = situation;
+
+    // 포지션별 플레이어 찾기 및 수정
+    positions.forEach((position) => {
+      if (position.includes('SB') || position === 'SB') {
+        const key = position.includes('HERO') ? 'HERO' : 'SB';
+        const currentStack = situation.remainingStacks[key] || 0;
+        const currentBet = situation.playerBets[key] || 0;
+        const totalStack = currentStack + currentBet;
+
+        // SB가 올인이 아니면 정확한 SB 금액으로 수정
+        if (totalStack >= blindLevel.small) {
+          situation.playerBets[key] = blindLevel.small;
+          situation.remainingStacks[key] = totalStack - blindLevel.small;
+        }
+      }
+
+      if (position.includes('BB') || position === 'BB') {
+        const key = position.includes('HERO') ? 'HERO' : 'BB';
+        const currentStack = situation.remainingStacks[key] || 0;
+        const currentBet = situation.playerBets[key] || 0;
+        const totalStack = currentStack + currentBet;
+
+        // BB가 올인이 아니면 정확한 BB 금액으로 수정
+        if (totalStack >= blindLevel.big) {
+          situation.playerBets[key] = blindLevel.big;
+          situation.remainingStacks[key] = totalStack - blindLevel.big;
+        }
+      }
+    });
+
+    // 총 팟 재계산
+    const newTotalPot =
+      situation.pot + Object.values(situation.playerBets).reduce((sum, bet) => sum + bet, 0);
+    situation.totalPotForCalculation = newTotalPot;
+
+    return scenario;
+  }
+
+  /**
+   * 전체 시나리오 자동 수정
+   * @param {Array} scenarios - 수정할 시나리오 배열
+   * @returns {Array} 수정된 시나리오 배열
+   */
+  autoFixAllScenarios(scenarios) {
+    return scenarios.map((scenario) => {
+      const fixed = { ...scenario };
+
+      // 각종 자동 수정 적용
+      this.fixBlindPosting(fixed);
+
+      return fixed;
+    });
+  }
+}
+
+// 개발용 검증 실행 함수
+export async function validateScenariosInConsole() {
+  if (typeof window !== 'undefined') {
+    try {
+      // fetch API를 사용해 JSON 데이터 로드
+      const response = await fetch('/src/data/scenarios.json');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const { scenarios } = data;
+
+      if (!scenarios || !Array.isArray(scenarios)) {
+        throw new Error('시나리오 데이터가 올바르지 않습니다');
+      }
+
+      const validator = new ScenarioValidator();
+      const results = validator.validateAllScenarios(scenarios);
+      validator.printValidationResults(results);
+
+      console.log('\n💡 추가 검증 정보:');
+      console.log(`- 검증된 시나리오: ${scenarios.length}개`);
+      console.log(
+        `- 성공률: ${((results.passedScenarios / results.totalScenarios) * 100).toFixed(1)}%`,
+      );
+
+      return results;
+    } catch (error) {
+      console.error('시나리오 데이터를 불러올 수 없습니다:', error);
+      console.error('fetch 경로:', '/src/data/scenarios.json');
+      return null;
+    }
+  } else {
+    console.error('브라우저 환경이 아닙니다.');
+    return null;
+  }
+}
+
 // 기본 검증기 인스턴스
 export const defaultValidator = new DataValidator();
+export const scenarioValidator = new ScenarioValidator();
 
 // CommonJS 호환성
 if (typeof module !== 'undefined' && module.exports) {
